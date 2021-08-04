@@ -24,7 +24,7 @@ jobs:
           - name: create CNAME
             if: github.repository == 'hat-open/hat-util'
             run: |
-                 echo "hat-util.hat-open.com" > build/CNAME
+                 echo "hat-util.hat-open.com" > build/docs/CNAME
           - name: deploy
             uses: peaceiris/actions-gh-pages@v3
             with:
