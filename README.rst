@@ -22,6 +22,18 @@ For more information see:
     functionality and API are unstable.
 
 
+Install
+-------
+
+Python library::
+
+    $ pip install hat-util
+
+JavaScript library::
+
+    $ npm add @hat-open/util
+
+
 License
 -------
 
