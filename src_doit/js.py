@@ -37,14 +37,13 @@ def task_js_build():
             common.mkdir_p(dst_path.parent)
             common.cp_r(src_path, dst_path)
 
-        version = common.get_version(common.VersionType.SEMVER)
         (build_dir / 'package.json').write_text(json.dumps({
             'name': '@hat-open/util',
-            'version': version,
+            'version': common.get_version(common.VersionType.SEMVER),
             'description': 'Hat utility module',
             'homepage': 'https://github.com/hat-open/hat-util',
             'bugs': 'https://github.com/hat-open/hat-util/issues',
-            'license': 'Apache-2.0',
+            'license': common.License.APACHE2.value,
             'main': 'index.js',
             'repository': 'hat-open/hat-util'
         }, indent=4))

@@ -38,7 +38,7 @@ def task_docs_py():
         subprocess.run([sys.executable, '-m', 'pdoc',
                         '--html', '--skip-errors', '-f',
                         '-o', str(py_api_dir),
-                        'hat'],
+                        'hat.util'],
                        stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL,
                        check=True)
