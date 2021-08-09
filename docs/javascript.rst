@@ -1,4 +1,4 @@
-`@hat-core/util` - JavaScript utility library
+`@hat-open/util` - JavaScript utility library
 =============================================
 
 Utility library for manipulation of JSON data.
@@ -23,4 +23,4 @@ API
 
 API reference is available as part of generated documentation:
 
-    * `@hat-core/util module <./js_api/module-@hat-open_util.html>`_
+    * `@hat-open/util module <./js_api/module-@hat-open_util.html>`_

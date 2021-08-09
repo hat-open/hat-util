@@ -2,7 +2,7 @@ from pathlib import Path
 import json
 import subprocess
 
-from . import common
+from hat.doit import common
 
 
 __all__ = ['task_js_build',
