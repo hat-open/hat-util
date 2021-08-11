@@ -12,7 +12,6 @@ __all__ = ['task_js_build',
 
 build_js_dir = Path('build/js')
 src_js_dir = Path('src_js')
-node_modules_dir = Path('node_modules')
 readme_path = Path('README.rst')
 
 
