@@ -2,9 +2,11 @@ from pathlib import Path
 
 from hat.doit import common
 
+from .c import *  # NOQA
 from .docs import *  # NOQA
 from .js import *  # NOQA
 from .py import *  # NOQA
+from . import c
 from . import docs
 from . import js
 from . import py
@@ -14,6 +16,8 @@ __all__ = ['task_clean_all',
            'task_build',
            'task_check',
            'task_test',
+           'task_format',
+           *c.__all__,
            *docs.__all__,
            *js.__all__,
            *py.__all__]
@@ -45,3 +49,9 @@ def task_test():
     """Test"""
     return {'actions': None,
             'task_dep': ['py_test']}
+
+
+def task_format():
+    """Format"""
+    return {'actions': None,
+            'task_dep': ['c_format']}
