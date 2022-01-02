@@ -16,7 +16,7 @@ typedef void *(*hat_allocator_alloc_t)(hat_allocator_t *a, size_t size,
 struct hat_allocator_t {
     void *ctx;
     hat_allocator_alloc_t alloc;
-}
+};
 
 
 extern hat_allocator_t hat_allocator_libc;
