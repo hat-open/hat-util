@@ -1,4 +1,5 @@
 #include "ht.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -64,6 +65,33 @@ void hat_ht_destroy(hat_ht_t *t) {
 
     hat_allocator_free(t->a, t->slots);
     hat_allocator_free(t->a, t);
+}
+
+
+int hat_ht_resize(hat_ht_t *t, size_t avg_count) {
+    size_t new_cap = avg_count * 10 / 8 + 1;
+    element_t **new_slots =
+        hat_allocator_alloc(t->a, new_cap * sizeof(element_t *), NULL);
+    if (!new_slots)
+        return HAT_HT_ERROR;
+
+    memset(new_slots, 0, new_cap * sizeof(element_t *));
+
+    for (size_t i = 0; i < t->cap; ++i) {
+        element_t *el = t->slots[i];
+        while (el) {
+            element_t *next = el->next;
+            el->next = new_slots[el->hash % new_cap];
+            new_slots[el->hash % new_cap] = el;
+            el = next;
+        }
+    }
+
+    hat_allocator_free(t->a, t->slots);
+
+    t->cap = new_cap;
+    t->slots = new_slots;
+    return HAT_HT_SUCCESS;
 }
 
 
