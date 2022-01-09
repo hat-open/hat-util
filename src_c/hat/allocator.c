@@ -3,6 +3,11 @@
 
 
 static void *libc_alloc(hat_allocator_t *a, size_t size, void *old) {
+    if (size < 1) {
+        if (old)
+            free(old);
+        return NULL;
+    }
     return realloc(old, size);
 }
 
