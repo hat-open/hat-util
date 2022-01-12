@@ -238,7 +238,7 @@ int hat_ht_iter_next(hat_ht_iter_t *i) {
     }
 
     hat_ht_t *t = i->t;
-    for (size_t j = (el->hash % t->cap) + 1; j < t->cap; ++i) {
+    for (size_t j = (el->hash % t->cap) + 1; j < t->cap; ++j) {
         if (t->slots[j]) {
             i->el = t->slots[j];
             return HAT_HT_SUCCESS;
