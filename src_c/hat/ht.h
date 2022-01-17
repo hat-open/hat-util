@@ -27,6 +27,7 @@ hat_ht_t *hat_ht_create(hat_allocator_t *a, size_t avg_count);
 void hat_ht_destroy(hat_ht_t *t);
 int hat_ht_resize(hat_ht_t *t, size_t avg_count);
 size_t hat_ht_count(hat_ht_t *t);
+size_t hat_ht_avg_count(hat_ht_t *t);
 
 int hat_ht_set(hat_ht_t *t, uint8_t *key, size_t key_size, void *value);
 int hat_ht_set_s(hat_ht_t *t, char *key, void *value);

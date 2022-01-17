@@ -98,6 +98,9 @@ int hat_ht_resize(hat_ht_t *t, size_t avg_count) {
 size_t hat_ht_count(hat_ht_t *t) { return t->count; }
 
 
+size_t hat_ht_avg_count(hat_ht_t *t) { return (t->cap - 1) * 8 / 10; }
+
+
 int hat_ht_set(hat_ht_t *t, uint8_t *key, size_t key_size, void *value) {
     size_t hash = hash_function(key, key_size);
     element_t *el = NULL;
