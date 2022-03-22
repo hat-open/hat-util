@@ -1,10 +1,9 @@
-test:
-    image: python:3.10-bullseye
-    action: |
-        mkdir -p .venv
-        python -m venv .venv
-        . .venv/bin/activate
+image: python:3.10-bullseye
+action: |
+    mkdir -p .venv
+    python -m venv .venv
+    . .venv/bin/activate
 
-        pip install -q -r requirements.pip.dev.txt
+    pip install -q -r requirements.pip.dev.txt
 
-        doit test
+    doit test
