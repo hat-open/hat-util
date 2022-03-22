@@ -1,5 +1,5 @@
 image: python:3.10-bullseye
-action: |
+command: |
     mkdir -p .venv
     python -m venv .venv
     . .venv/bin/activate
