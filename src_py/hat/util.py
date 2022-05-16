@@ -69,7 +69,6 @@ class RegisterCallbackHandle(typing.NamedTuple):
 
 ExceptionCb = typing.Callable[[Exception], None]
 """Exception callback"""
-register_type_alias('ExceptionCb')
 
 
 class CallbackRegistry:
@@ -136,3 +135,7 @@ def get_unused_udp_port(host: str = '127.0.0.1') -> int:
     with contextlib.closing(socket.socket(type=socket.SOCK_DGRAM)) as sock:
         sock.bind((host, 0))
         return sock.getsockname()[1]
+
+
+# HACK type alias
+register_type_alias('ExceptionCb')
