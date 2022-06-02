@@ -8,19 +8,12 @@
 #define HAT_HT_SUCCESS 0
 #define HAT_HT_ERROR 1
 
-#define HAT_HT_ITER_IS_END(x) ((x).el == NULL)
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct hat_ht_t hat_ht_t;
-
-typedef struct hat_ht_iter_t {
-    hat_ht_t *t;
-    void *el;
-} hat_ht_iter_t;
+typedef void *hat_ht_iter_t;
 
 
 hat_ht_t *hat_ht_create(hat_allocator_t *a, size_t avg_count);
@@ -44,13 +37,12 @@ int hat_ht_del_s(hat_ht_t *t, char *key);
 int hat_ht_del_i64(hat_ht_t *t, int64_t key);
 int hat_ht_del_u64(hat_ht_t *t, uint64_t key);
 
-int hat_ht_iter_init(hat_ht_t *t, hat_ht_iter_t *i);
-int hat_ht_iter_next(hat_ht_iter_t *i);
-int hat_ht_iter_key(hat_ht_iter_t *i, uint8_t **key, size_t *key_size);
-int hat_ht_iter_key_s(hat_ht_iter_t *i, char **key);
-int hat_ht_iter_key_i64(hat_ht_iter_t *i, int64_t *key);
-int hat_ht_iter_key_u64(hat_ht_iter_t *i, uint64_t *key);
-int hat_ht_iter_value(hat_ht_iter_t *i, void **value);
+hat_ht_iter_t hat_ht_iter_next(hat_ht_t *t, hat_ht_iter_t prev);
+int hat_ht_iter_key(hat_ht_iter_t i, uint8_t **key, size_t *key_size);
+int hat_ht_iter_key_s(hat_ht_iter_t i, char **key);
+int hat_ht_iter_key_i64(hat_ht_iter_t i, int64_t *key);
+int hat_ht_iter_key_u64(hat_ht_iter_t i, uint64_t *key);
+int hat_ht_iter_value(hat_ht_iter_t i, void **value);
 
 #ifdef __cplusplus
 }

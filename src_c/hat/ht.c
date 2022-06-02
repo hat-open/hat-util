@@ -34,7 +34,7 @@ static size_t hash_function(uint8_t *key, size_t key_size) {
 
 
 hat_ht_t *hat_ht_create(hat_allocator_t *a, size_t avg_count) {
-    hat_ht_t *t = hat_allocator_alloc(a, sizeof(hat_ht_t), NULL);
+    hat_ht_t *t = hat_allocator_alloc(a, sizeof(hat_ht_t));
     if (!t)
         return NULL;
 
@@ -42,7 +42,7 @@ hat_ht_t *hat_ht_create(hat_allocator_t *a, size_t avg_count) {
     t->count = 0;
     t->cap = avg_count * 10 / 8 + 1;
 
-    t->slots = hat_allocator_alloc(a, t->cap * sizeof(element_t *), NULL);
+    t->slots = hat_allocator_alloc(a, t->cap * sizeof(element_t *));
     if (!t->slots) {
         hat_allocator_free(a, t);
         return NULL;
@@ -71,7 +71,7 @@ void hat_ht_destroy(hat_ht_t *t) {
 int hat_ht_resize(hat_ht_t *t, size_t avg_count) {
     size_t new_cap = avg_count * 10 / 8 + 1;
     element_t **new_slots =
-        hat_allocator_alloc(t->a, new_cap * sizeof(element_t *), NULL);
+        hat_allocator_alloc(t->a, new_cap * sizeof(element_t *));
     if (!new_slots)
         return HAT_HT_ERROR;
 
@@ -116,7 +116,7 @@ int hat_ht_set(hat_ht_t *t, uint8_t *key, size_t key_size, void *value) {
     }
 
     if (!el) {
-        el = hat_allocator_alloc(t->a, sizeof(element_t) + key_size, NULL);
+        el = hat_allocator_alloc(t->a, sizeof(element_t) + key_size);
         if (!el)
             return HAT_HT_ERROR;
 
@@ -215,46 +215,23 @@ int hat_ht_del_u64(hat_ht_t *t, uint64_t key) {
 }
 
 
-int hat_ht_iter_init(hat_ht_t *t, hat_ht_iter_t *i) {
-    i->t = t;
-    i->el = NULL;
+hat_ht_iter_t hat_ht_iter_next(hat_ht_t *t, hat_ht_iter_t prev) {
+    element_t *el = prev;
 
-    for (size_t j = 0; j < t->cap; ++j) {
-        if (t->slots[j]) {
-            i->el = t->slots[j];
-            return HAT_HT_SUCCESS;
-        }
+    if (el && el->next)
+        return el->next;
+
+    for (size_t i = (el ? (el->hash % t->cap) + 1 : 0); i < t->cap; ++i) {
+        if (t->slots[i])
+            return t->slots[i];
     }
 
-    return HAT_HT_ERROR;
+    return NULL;
 }
 
 
-int hat_ht_iter_next(hat_ht_iter_t *i) {
-    element_t *el = i->el;
-    if (!el)
-        return HAT_HT_ERROR;
-
-    if (el->next) {
-        i->el = el->next;
-        return HAT_HT_SUCCESS;
-    }
-
-    hat_ht_t *t = i->t;
-    for (size_t j = (el->hash % t->cap) + 1; j < t->cap; ++j) {
-        if (t->slots[j]) {
-            i->el = t->slots[j];
-            return HAT_HT_SUCCESS;
-        }
-    }
-
-    i->el = NULL;
-    return HAT_HT_ERROR;
-}
-
-
-int hat_ht_iter_key(hat_ht_iter_t *i, uint8_t **key, size_t *key_size) {
-    element_t *el = i->el;
+int hat_ht_iter_key(hat_ht_iter_t i, uint8_t **key, size_t *key_size) {
+    element_t *el = i;
     if (!el)
         return HAT_HT_ERROR;
 
@@ -264,8 +241,8 @@ int hat_ht_iter_key(hat_ht_iter_t *i, uint8_t **key, size_t *key_size) {
 }
 
 
-int hat_ht_iter_key_s(hat_ht_iter_t *i, char **key) {
-    element_t *el = i->el;
+int hat_ht_iter_key_s(hat_ht_iter_t i, char **key) {
+    element_t *el = i;
     if (!el)
         return HAT_HT_ERROR;
 
@@ -274,8 +251,8 @@ int hat_ht_iter_key_s(hat_ht_iter_t *i, char **key) {
 }
 
 
-int hat_ht_iter_key_i64(hat_ht_iter_t *i, int64_t *key) {
-    element_t *el = i->el;
+int hat_ht_iter_key_i64(hat_ht_iter_t i, int64_t *key) {
+    element_t *el = i;
     if (!el)
         return HAT_HT_ERROR;
 
@@ -284,8 +261,8 @@ int hat_ht_iter_key_i64(hat_ht_iter_t *i, int64_t *key) {
 }
 
 
-int hat_ht_iter_key_u64(hat_ht_iter_t *i, uint64_t *key) {
-    element_t *el = i->el;
+int hat_ht_iter_key_u64(hat_ht_iter_t i, uint64_t *key) {
+    element_t *el = i;
     if (!el)
         return HAT_HT_ERROR;
 
@@ -294,8 +271,8 @@ int hat_ht_iter_key_u64(hat_ht_iter_t *i, uint64_t *key) {
 }
 
 
-int hat_ht_iter_value(hat_ht_iter_t *i, void **value) {
-    element_t *el = i->el;
+int hat_ht_iter_value(hat_ht_iter_t i, void **value) {
+    element_t *el = i;
     if (!el)
         return HAT_HT_ERROR;
 

@@ -1,5 +1,6 @@
 /.doit.db
 /build
+/compile_flags.txt
 /node_modules
 /test_pytest/.coverage
 __pycache__
