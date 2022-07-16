@@ -27,7 +27,6 @@ def task_py_build():
             description='Hat utility library',
             url='https://github.com/hat-open/hat-util',
             license=common.License.APACHE2,
-            packages=['hat'],
             requirements_path=None)
 
     return {'actions': [build]}
