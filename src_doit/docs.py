@@ -1,7 +1,6 @@
 from pathlib import Path
 
-from hat.doit.docs import (SphinxOutputType,
-                           build_sphinx,
+from hat.doit.docs import (build_sphinx,
                            build_pdoc,
                            build_jsdoc)
 
@@ -19,9 +18,13 @@ docs_dir = Path('docs')
 
 def task_docs():
     """Docs - build documentation"""
-    return {'actions': [(build_sphinx, [SphinxOutputType.HTML,
-                                        docs_dir,
-                                        build_docs_dir])],
+
+    def build():
+        build_sphinx(src_dir=docs_dir,
+                     dst_dir=build_docs_dir,
+                     project='hat-util')
+
+    return {'actions': [build],
             'task_dep': ['docs_py',
                          'docs_js']}
 
