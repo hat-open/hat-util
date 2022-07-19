@@ -10,4 +10,4 @@ static void *py_realloc(hat_allocator_t *a, size_t size, void *old) {
 }
 
 
-hat_allocator_t hat_py_allocator = {.ctx = NULL, .realloc = py_realloc};
+hat_allocator_t hat_py_allocator = {.realloc = py_realloc};

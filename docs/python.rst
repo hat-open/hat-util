@@ -1,13 +1,9 @@
-.. _hat-util:
-
 `hat.util` - Python utility library
 ===================================
 
 This module includes few simple function/mechanics not available as part of
 Python standard library.
 
-
-.. _hat-util-first:
 
 `hat.util.first`
 ----------------
@@ -49,8 +45,6 @@ Some of possible application of this function include:
             assert first(range(3), lambda x: x > 2) is None
             assert first(range(3), lambda x: x > 2, 123) == 123
 
-
-.. _hat-util-CallbackRegistry:
 
 `hat.util.CallbackRegistry`
 ---------------------------
@@ -100,9 +94,6 @@ Usage example::
     assert y == [2]
 
 
-.. _hat-util-get_unused_tcp_port:
-.. _hat-util-get_unused_udp_port:
-
 `hat.util.get_unused_tcp_port` and `hat.util.get_unused_udp_port`
 -----------------------------------------------------------------
 
@@ -123,8 +114,6 @@ return different results.
 
     def get_unused_udp_port(host: str = '127.0.0.1') -> int: ...
 
-
-.. _hat-util-api:
 
 API
 ---

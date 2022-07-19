@@ -1,11 +1,11 @@
-#ifndef HAT_BUF_H
-#define HAT_BUF_H
+#ifndef HAT_BUFF_H
+#define HAT_BUFF_H
 
 #include <stdint.h>
 #include <string.h>
 
-#define HAT_BUF_SUCCESS 0
-#define HAT_BUF_ERROR 1
+#define HAT_BUFF_SUCCESS 0
+#define HAT_BUFF_ERROR 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,10 +25,10 @@ static inline size_t hat_buff_available(hat_buff_t *buff) {
 static inline int hat_buff_write(hat_buff_t *buff, uint8_t *data,
                                  size_t data_len) {
     if (hat_buff_available(buff) < data_len)
-        return HAT_BUF_ERROR;
+        return HAT_BUFF_ERROR;
     memcpy(buff->data + buff->pos, data, data_len);
     buff->pos += data_len;
-    return HAT_BUF_SUCCESS;
+    return HAT_BUFF_SUCCESS;
 }
 
 static inline uint8_t *hat_buff_read(hat_buff_t *buff, size_t size) {

@@ -13,7 +13,6 @@ typedef void *(*hat_allocator_realloc_t)(hat_allocator_t *a, size_t size,
                                          void *old);
 
 struct hat_allocator_t {
-    void *ctx;
     hat_allocator_realloc_t realloc;
 };
 

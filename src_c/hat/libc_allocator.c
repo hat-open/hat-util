@@ -10,4 +10,4 @@ static void *libc_realloc(hat_allocator_t *a, size_t size, void *old) {
 }
 
 
-hat_allocator_t hat_libc_allocator = {.ctx = NULL, .realloc = libc_realloc};
+hat_allocator_t hat_libc_allocator = {.realloc = libc_realloc};
