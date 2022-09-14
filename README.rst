@@ -1,5 +1,5 @@
-hat-util - Python and JavaScript utility library
-================================================
+hat-util - Python, JavaScript and C utility library
+===================================================
 
 This library is part of Hat Open project - open-source framework of tools and
 libraries for developing applications used for remote monitoring, control and

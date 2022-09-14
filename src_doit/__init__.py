@@ -1,4 +1,6 @@
 from pathlib import Path
+import subprocess
+import tempfile
 
 from hat.doit import common
 from hat.doit.c import get_task_clang_format
@@ -26,6 +28,7 @@ __all__ = ['task_clean_all',
 build_dir = Path('build')
 src_py_dir = Path('src_py')
 src_js_dir = Path('src_js')
+src_c_dir = Path('src_c')
 pytest_dir = Path('test_pytest')
 docs_dir = Path('docs')
 
@@ -114,5 +117,34 @@ def task_docs():
                    dst_dir=build_docs_dir / 'py_api')
         build_jsdoc(src_js_dir, build_docs_dir / 'js_api')
 
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            path = tmpdir / 'Doxyfile'
+            path.write_text(_doxyfile)
+            subprocess.run(['doxygen', str(path)],
+                           check=True)
+
     return {'actions': [build],
             'task_dep': ['node_modules']}
+
+
+_doxyfile = f"""
+PROJECT_NAME          = "hat-util"
+PROJECT_NUMBER        = "{common.get_version()}"
+PROJECT_BRIEF         = "Utility library"
+OUTPUT_DIRECTORY      = {build_docs_dir / 'c_api'}
+INPUT                 = {src_c_dir}
+FILE_PATTERNS         = *.h
+RECURSIVE             = YES
+STRIP_FROM_PATH       = {src_c_dir}
+OPTIMIZE_OUTPUT_FOR_C = YES
+SEARCHENGINE          = NO
+GENERATE_TREEVIEW     = YES
+FULL_SIDEBAR          = YES
+DISABLE_INDEX         = YES
+EXTRACT_ALL           = YES
+EXTRACT_STATIC        = YES
+GENERATE_LATEX        = NO
+HTML_OUTPUT           = .
+QUIET                 = YES
+"""
