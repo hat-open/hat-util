@@ -5,8 +5,7 @@ import tempfile
 from hat.doit import common
 from hat.doit.c import get_task_clang_format
 from hat.doit.docs import (build_sphinx,
-                           build_pdoc,
-                           build_jsdoc)
+                           build_pdoc)
 from hat.doit.js import (build_npm,
                          run_eslint)
 from hat.doit.py import (build_wheel,
@@ -19,6 +18,7 @@ __all__ = ['task_clean_all',
            'task_build',
            'task_build_py',
            'task_build_js',
+           'task_build_ts',
            'task_test',
            'task_check',
            'task_format',
@@ -34,6 +34,7 @@ docs_dir = Path('docs')
 
 build_py_dir = build_dir / 'py'
 build_js_dir = build_dir / 'js'
+build_ts_dir = build_dir / 'ts'
 build_docs_dir = build_dir / 'docs'
 
 
@@ -74,13 +75,26 @@ def task_build_js():
 
     def build():
         build_npm(
-            src_dir=src_js_dir,
+            src_dir=build_ts_dir,
             dst_dir=build_js_dir,
             name='@hat-open/util',
             description='Hat utility module',
             license=common.License.APACHE2,
             homepage='https://github.com/hat-open/hat-util',
             repository='hat-open/hat-util')
+
+    return {'actions': [build],
+            'task_dep': ['build_ts',
+                         'node_modules']}
+
+
+def task_build_ts():
+    """Build TypeScript"""
+
+    def build():
+        subprocess.run(['node_modules/.bin/tsc',
+                        '-p', str(src_js_dir / 'tsconfig.json')],
+                       check=True)
 
     return {'actions': [build],
             'task_dep': ['node_modules']}
@@ -115,7 +129,13 @@ def task_docs():
                      project='hat-util')
         build_pdoc(module='hat.util',
                    dst_dir=build_docs_dir / 'py_api')
-        build_jsdoc(src_js_dir, build_docs_dir / 'js_api')
+        subprocess.run(['node_modules/.bin/typedoc',
+                        '--logLevel', 'Warn',
+                        '--name', '@hat-open/util',
+                        '--out', str(build_docs_dir / 'js_api'),
+                        '--tsconfig', str(src_js_dir / 'tsconfig.json'),
+                        str(src_js_dir / 'index.ts')],
+                       check=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)

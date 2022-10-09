@@ -23,4 +23,4 @@ API
 
 API reference is available as part of generated documentation:
 
-    * `@hat-open/util module <js_api/module-@hat-open_util.html>`_
+    * `@hat-open/util module <js_api/index.html>`_
