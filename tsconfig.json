@@ -2,10 +2,12 @@
     "compilerOptions": {
         "target": "es2022",
         "module": "es2022",
-        "outDir": "../build/ts",
+        "outDir": "build/ts",
         "allowJs": true,
         "declaration": true,
         "strict": true,
-        "moduleResolution": "node"
-    }
+        "moduleResolution": "node",
+        "rootDir": "src_js"
+    },
+    "include": ["src_js/**/*"]
 }

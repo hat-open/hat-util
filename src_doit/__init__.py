@@ -6,8 +6,7 @@ from hat.doit import common
 from hat.doit.c import get_task_clang_format
 from hat.doit.docs import (build_sphinx,
                            build_pdoc)
-from hat.doit.js import (build_npm,
-                         run_eslint)
+from hat.doit.js import build_npm
 from hat.doit.py import (build_wheel,
                          run_pytest,
                          run_flake8)
@@ -92,8 +91,7 @@ def task_build_ts():
     """Build TypeScript"""
 
     def build():
-        subprocess.run(['node_modules/.bin/tsc',
-                        '-p', str(src_js_dir / 'tsconfig.json')],
+        subprocess.run(['node_modules/.bin/tsc'],
                        check=True)
 
     return {'actions': [build],
@@ -108,10 +106,10 @@ def task_test():
 
 def task_check():
     """Check"""
+    # TODO run eslint with ts
     return {'actions': [(run_flake8, [src_py_dir]),
-                        (run_flake8, [pytest_dir]),
-                        (run_eslint, [src_js_dir])],
-            'task_dep': ['node_modules']}
+                        (run_flake8, [pytest_dir])],
+            'task_dep': ['build_ts']}
 
 
 def task_format():
@@ -133,7 +131,6 @@ def task_docs():
                         '--logLevel', 'Warn',
                         '--name', '@hat-open/util',
                         '--out', str(build_docs_dir / 'js_api'),
-                        '--tsconfig', str(src_js_dir / 'tsconfig.json'),
                         str(src_js_dir / 'index.ts')],
                        check=True)
 
