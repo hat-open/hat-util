@@ -1,4 +1,4 @@
-import { curry } from './curry';
+import { curry, Curried1, Curried2, Curried3 } from './curry';
 
 
 /**
@@ -194,10 +194,10 @@ export function flap<T extends [...any]>(
 /**
  * Deep object equality
  */
-export const equals = curry((
+export function _equals(
     x: any,
     y: any
-): boolean => {
+): boolean {
     if (x === y)
         return true;
     if (typeof(x) != 'object' ||
@@ -209,7 +209,7 @@ export const equals = curry((
         if (x.length != y.length)
             return false;
         for (const [a, b] of zip(x, y)) {
-            if (!equals(a, b))
+            if (!_equals(a, b))
                 return false;
         }
         return true;
@@ -221,22 +221,37 @@ export const equals = curry((
                 return false;
         }
         for (const key in x) {
-            if (!equals(x[key], y[key]))
+            if (!_equals(x[key], y[key]))
                 return false;
         }
         return true;
     }
     return false;
-});
+}
+
+/**
+ * Curried `_equals`
+ */
+export const equals = curry(_equals);
 
 /**
  * Create array by repeating same value
  */
-export const repeat = curry(<T>(
+export function _repeat<T>(
     x: T,
     n: number
-): T[] => Array.from({length: n}, _ => x));
+): T[] {
+    return Array.from({length: n}, _ => x);
+}
 
+/**
+ * Curried `_repeat`
+ */
+export const repeat = curry(_repeat) as {
+    <T>(): Curried2<T, number, T[]>;
+    <T>(x: T): Curried1<number, T[]>;
+    <T>(x: T, n: number): T[];
+};
 
 /**
  * Sort array
@@ -247,10 +262,21 @@ export const repeat = curry(<T>(
  *   - zero in case first argument is equaly significant as second
  *   - positive number in case first argument is less significant then second
  */
-export const sort = curry(<T>(
+export function _sort<T>(
     fn: ((x: T, y: T) => number),
     arr: T[]
-): T[] => Array.from(arr).sort(fn));
+): T[] {
+    return Array.from(arr).sort(fn);
+}
+
+/**
+ * Curried `_sort`
+ */
+export const sort = curry(_sort) as {
+    <T>(): Curried2<((x: T, y: T) => number), T[], T[]>;
+    <T>(fn: ((x: T, y: T) => number)): Curried1<T[], T[]>;
+    <T>(fn: ((x: T, y: T) => number), arr: T[]): T[];
+};
 
 /**
  * Sort array based on results of appling function to it's elements
@@ -259,32 +285,55 @@ export const sort = curry(<T>(
  * Resulting order is determined by comparring function application results
  * with greater then and lesser then operators.
  */
-export const sortBy = curry(<T>(
+export function _sortBy<T>(
     fn: ((x: T) => any),
     arr: T[]
-): T[] => sort((x: T, y: T) => {
-    const xVal = fn(x);
-    const yVal = fn(y);
-    if (xVal < yVal)
-        return -1;
-    if (xVal > yVal)
-        return 1;
-    return 0;
-}, arr));
+): T[] {
+    return _sort((x, y) => {
+        const xVal = fn(x);
+        const yVal = fn(y);
+        if (xVal < yVal)
+            return -1;
+        if (xVal > yVal)
+            return 1;
+        return 0;
+    }, arr);
+}
+
+/**
+ * Curried `_sortBy`
+ */
+export const sortBy = curry(_sortBy) as {
+    <T>(): Curried2<((x: T) => any), T[], T[]>;
+    <T>(fn: ((x: T) => any)): Curried1<T[], T[]>;
+    <T>(fn: ((x: T) => any), arr: T[]): T[];
+};
 
 /**
  * Create object containing only subset of selected properties
  */
-export const pick = curry((
+export function _pick<T extends {[key: string]: any}>(
     arr: string[],
-    obj: {[key: string]: any}
-): {[key: string]: any} => {
-    const ret: typeof obj = {};
-    for (const i of arr)
-        if (i in obj)
+    obj: T
+): T {
+    const ret = {} as T;
+    for (const i of arr) {
+        if (i in obj) {
+            // @ts-ignore
             ret[i] = obj[i];
+        }
+    }
     return ret;
-});
+}
+
+/**
+ * Curried `_pick`
+ */
+export const pick = curry(_pick) as {
+    <T extends {[key: string]: any}>(): Curried2<string[], T, T>;
+    <T extends {[key: string]: any}>(arr: string[]): Curried1<T, T>;
+    <T extends {[key: string]: any}>(arr: string[], obj: T): T;
+};
 
 /**
  * Change array or object by appling function to it's elements
@@ -292,41 +341,98 @@ export const pick = curry((
  * For each element, provided function is called with element value,
  * index/key and original container.
  */
-export const map = curry((() => {
-    function _map<T1, T2>(
+export function _map<T1, T2>(
+    fn: ((val: T1, index?: number, arr?: T1[]) => T2),
+    arr: T1[]
+): T2[];
+export function _map<T1, T2>(
+    fn: ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+    obj: {[key: string]: T1}
+): {[key: string]: T2};
+export function _map(fn: any, x: any) {
+    if (isArray(x))
+        return x.map(fn);
+    const res: typeof x = {};
+    for (const k in x)
+        res[k] = fn(x[k], k, x);
+    return res;
+}
+
+/**
+ * Curried `_map`
+ */
+export const map = curry(_map) as {
+    <T1, T2>(): (
+        Curried2<
+            ((val: T1, index?: number, arr?: T1[]) => T2),
+            T1[],
+            T2[]
+        > |
+        Curried2<
+            ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+            {[key: string]: T1},
+            {[key: string]: T2}
+        >
+    );
+    <T1, T2>(
+        fn: ((val: T1, index?: number, arr?: T1[]) => T2)
+    ): Curried1<
+        T1[],
+        T2[]
+    >;
+    <T1, T2>(
+        fn: ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2)
+    ): Curried1<
+        {[key: string]: T1},
+        {[key: string]: T2}
+    >;
+    <T1, T2>(
         fn: ((val: T1, index?: number, arr?: T1[]) => T2),
         arr: T1[]
     ): T2[];
-    function _map<T1, T2>(
+    <T1, T2>(
         fn: ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
         obj: {[key: string]: T1}
     ): {[key: string]: T2};
-    function _map(fn: any, x: any) {
-        if (isArray(x))
-            return x.map(fn);
-        const res: typeof x = {};
-        for (const k in x)
-            res[k] = fn(x[k], k, x);
-        return res;
-    }
-    return _map;
-})());
+};
 
 /**
  * Change array to contain only elements for which function returns `true`
  */
-export const filter = curry(<T>(
+export function _filter<T>(
     fn: ((val: T) => boolean),
     arr: T[]
-): T[] => arr.filter(fn));
+): T[] {
+    return arr.filter(fn);
+}
+
+/**
+ * Curried `_filter`
+ */
+export const filter = curry(_filter) as {
+    <T>(): Curried2<((val: T) => boolean), T[], T[]>;
+    <T>(fn: ((val: T) => boolean)): Curried1<T[], T[]>;
+    <T>(fn: ((val: T) => boolean), arr: T[]): T[];
+};
 
 /**
  * Append value to end of array
  */
-export const append = curry(<T>(
+export function _append<T>(
     val: T,
     arr: T[]
-): T[] => arr.concat([val]));
+): T[] {
+    return arr.concat([val])
+}
+
+/**
+ * Curried `_append`
+ */
+export const append = curry(_append) as {
+    <T>(): Curried2<T, T[], T[]>;
+    <T>(val: T): Curried1<T[], T[]>;
+    <T>(val: T, arr: T[]): T[];
+};
 
 /**
  * Reduce array or object by appling function
@@ -334,27 +440,82 @@ export const append = curry(<T>(
  * For each element, provided function is called with accumulator,
  * elements value, element index/key and original container.
  */
-export const reduce = curry((() => {
-    function _reduce<T1, T2>(
+export function _reduce<T1, T2>(
+    fn: ((acc: T2, val: T1, index?: number, arr?: T1[]) => T2),
+    val: T2,
+    arr: T1[]
+): T2;
+export function _reduce<T1, T2>(
+    fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+    val: T2,
+    obj: {[key: string]: T1}
+): T2;
+export function _reduce(fn: any, val: any, x: any) {
+    if (isArray(x))
+        return x.reduce(fn, val);
+    let acc = val;
+    for (const k in x)
+        acc = fn(acc, x[k], k, x);
+    return acc;
+}
+
+/**
+ * Curried `_reduce`
+ */
+export const reduce = curry(_reduce) as {
+    <T1, T2>(): (
+        Curried3<
+            ((acc: T2, val: T1, index?: number, arr?: T1[]) => T2),
+            T2,
+            T1[],
+            T2
+        > |
+        Curried3<
+            ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+            T2,
+            {[key: string]: T1},
+            T2
+        >
+    );
+    <T1, T2>(
+        fn: ((acc: T2, val: T1, index?: number, arr?: T1[]) => T2)
+    ): Curried2<
+        T2,
+        T1[],
+        T2
+    >;
+    <T1, T2>(
+        fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2)
+    ): Curried2<
+        T2,
+        {[key: string]: T1},
+        T2
+    >;
+    <T1, T2>(
+        fn: ((acc: T2, val: T1, index?: number, arr?: T1[]) => T2),
+        val: T2
+    ): Curried1<
+        T1[],
+        T2
+    >;
+    <T1, T2>(
+        fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+        val: T2
+    ): Curried1<
+        {[key: string]: T1},
+        T2
+    >;
+    <T1, T2>(
         fn: ((acc: T2, val: T1, index?: number, arr?: T1[]) => T2),
         val: T2,
         arr: T1[]
     ): T2;
-    function _reduce<T1, T2>(
+    <T1, T2>(
         fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
         val: T2,
         obj: {[key: string]: T1}
     ): T2;
-    function _reduce(fn: any, val: any, x: any) {
-        if (isArray(x))
-            return x.reduce(fn, val);
-        let acc = val;
-        for (const k in x)
-            acc = fn(acc, x[k], k, x);
-        return acc;
-    }
-    return _reduce;
-})());
+};
 
 /**
  * Merge two objects
@@ -362,10 +523,21 @@ export const reduce = curry((() => {
  * If same property exist in both arguments, second argument's value is used
  * as resulting value
  */
-export const merge = curry(<T extends {[key: string]: any}>(
+export function _merge<T extends {[key: string]: any}>(
     x: T,
     y: T
-): T => Object.assign({}, x, y));
+): T {
+    return Object.assign({}, x, y);
+}
+
+/**
+ * Curried `_merge`
+ */
+export const merge = curry(_merge) as {
+    <T extends {[key: string]: any}>(): Curried2<T, T, T>;
+    <T extends {[key: string]: any}>(x: T): Curried1<T, T>;
+    <T extends {[key: string]: any}>(x: T, y: T): T;
+};
 
 /**
  * Merge multiple objects
@@ -373,114 +545,241 @@ export const merge = curry(<T extends {[key: string]: any}>(
  * If same property exist in multiple arguments, value from the last argument
  * containing that property is used
  */
-export const mergeAll = reduce(merge, {} as {[key: string]: any});
+export function mergeAll<T extends {[key: string]: any}>(
+    objs: T[]
+): T {
+    return _reduce(merge<T>, {} as T, objs);
+}
 
 /**
  * Find element in array or object for which provided function returns `true`
- * (curried function)
  *
  * Until element is found, provided function is called for each element with
  * arguments: current element, current index/key and initial container.
  *
  * If searched element is not found, `undefined` is returned.
  */
-export const find = curry((() => {
-    function _find<T>(
+export function _find<T>(
+    fn: ((val: T, index?: number, arr?: T) => boolean),
+    arr: T[]
+): T | undefined;
+export function _find<T>(
+    fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
+    obj: {[key: string]: T}
+): T | undefined;
+export function _find(fn: any, x: any) {
+    if (isArray(x))
+        return x.find(fn);
+    for (const k in x)
+        if (fn(x[k], k, x))
+            return x[k];
+}
+
+/**
+ * Curried `_find`
+ */
+export const find = curry(_find) as {
+    <T>(): (
+        Curried2<
+            ((val: T, index?: number, arr?: T) => boolean),
+            T[],
+            T | undefined
+        > |
+        Curried2<
+            ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
+            {[key: string]: T},
+            T | undefined
+        >
+    );
+    <T>(
+        fn: ((val: T, index?: number, arr?: T) => boolean)
+    ): Curried1<
+        T[],
+        T | undefined
+    >;
+    <T>(
+        fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean)
+    ): Curried1<
+        {[key: string]: T},
+        T | undefined
+    >;
+    <T>(
         fn: ((val: T, index?: number, arr?: T) => boolean),
         arr: T[]
     ): T | undefined;
-    function _find<T>(
+    <T>(
         fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
         obj: {[key: string]: T}
     ): T | undefined;
-    function _find(fn: any, x: any) {
-        if (isArray(x))
-            return x.find(fn);
-        for (const k in x)
-            if (fn(x[k], k, x))
-                return x[k];
-    }
-    return _find;
-})());
+};
 
 /**
  * Find element's index/key in array or object for which provided function
  * returns `true`
- * (curried function)
  *
  * Until element is found, provided function is called for each element with
  * arguments: current element, current index/key and initial container.
  *
  * If searched element is not found, `undefined` is returned.
  */
-export const findIndex = curry((() => {
-    function _findIndex<T>(
+export function _findIndex<T>(
+    fn: ((val: T, index?: number, arr?: T) => boolean),
+    arr: T[]
+): number | undefined;
+export function _findIndex<T>(
+    fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
+    obj: {[key: string]: T}
+): string | undefined;
+export function _findIndex(fn: any, x: any) {
+    if (isArray(x))
+        return x.findIndex(fn);
+    for (let k in x)
+        if (fn(x[k], k, x))
+            return k;
+}
+
+/**
+ * Curried `_findIndex`
+ */
+export const findIndex = curry(_findIndex) as {
+    <T>(): (
+        Curried2<
+            ((val: T, index?: number, arr?: T) => boolean),
+            T[],
+            number | undefined
+        > |
+        Curried2<
+            ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
+            {[key: string]: T},
+            string | undefined
+        >
+    );
+    <T>(
+        fn: ((val: T, index?: number, arr?: T) => boolean)
+    ): Curried1<
+        T[],
+        number | undefined
+    >;
+    <T>(
+        fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean)
+    ): Curried1<
+        {[key: string]: T},
+        string | undefined
+    >;
+    <T>(
         fn: ((val: T, index?: number, arr?: T) => boolean),
         arr: T[]
     ): number | undefined;
-    function _findIndex<T>(
+    <T>(
         fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
         obj: {[key: string]: T}
     ): string | undefined;
-    function _findIndex(fn: any, x: any) {
-        if (isArray(x))
-            return x.findIndex(fn);
-        for (let k in x)
-            if (fn(x[k], k, x))
-                return k;
-    }
-    return _findIndex;
-})());
+};
 
 /**
  * Concatenate two arrays
  */
-export const concat = curry(<T>(
+export function _concat<T>(
     x: T[],
     y: T[]
-): T[] => x.concat(y));
+): T[] {
+    return x.concat(y);
+}
+
+/**
+ * Curried `_concat`
+ */
+export const concat = curry(_concat) as {
+    <T>(): Curried2<T[], T[], T[]>;
+    <T>(x: T[]): Curried1<T[], T[]>;
+    <T>(x: T[], y: T[]): T[];
+};
 
 /**
  * Create union of two arrays using `equals` to check equality
  */
-export const union = curry(<T>(
+export function _union<T>(
     x: T[],
     y: T[]
-): T[] => {
-    return reduce((acc: T[], val: T) => {
-        if (!find(equals(val), x))
-            acc = append(val, acc);
+): T[] {
+    return _reduce((acc: T[], val: T) => {
+        if (!_find(equals(val), x))
+            acc = _append(val, acc);
         return acc;
     }, x, y);
-});
+}
+
+/**
+ * Curried `_union`
+ */
+export const union = curry(_union) as {
+    <T>(): Curried2<T[], T[], T[]>;
+    <T>(x: T[]): Curried1<T[], T[]>;
+    <T>(x: T[], y: T[]): T[];
+};
 
 /**
  * Check if array contains value
  *
  * TODO: add support for objects (should we check for keys or values?)
  */
-export const contains = curry(<T>(
+export function _contains<T>(
     val: T,
     arr: T[]
-): boolean => arr.includes(val));
+): boolean {
+    return arr.includes(val);
+}
+
+/**
+ * Curried `_contains`
+ */
+export const contains = curry(_contains) as {
+    <T>(): Curried2<T, T[], boolean>;
+    <T>(val: T): Curried1<T[], boolean>;
+    <T>(val: T, arr: T[]): boolean;
+};
 
 /**
  * Insert value into array on specified index
  */
-export const insert = curry(<T>(
+export function _insert<T>(
     idx: number,
     val: T,
     arr: T[]
-): T[] => arr.slice(0, idx).concat([val], arr.slice(idx)));
+): T[] {
+    return arr.slice(0, idx).concat([val], arr.slice(idx));
+}
+
+/**
+ * Curried `_insert`
+ */
+export const insert = curry(_insert) as {
+    <T>(): Curried3<number, T, T[], T[]>;
+    <T>(idx: number): Curried2<T, T[], T[]>;
+    <T>(idx: number, val: T): Curried1<T[], T[]>;
+    <T>(idx: number, val: T, arr: T[]): T[];
+};
 
 /**
  * Get array slice
  */
-export const slice = curry(<T>(
+export function _slice<T>(
     begin: number,
     end: number,
     arr: T[]
-): T[] => arr.slice(begin, end));
+): T[] {
+    return arr.slice(begin, end);
+}
+
+/**
+ * Curried `_slice`
+ */
+export const slice = curry(_slice) as {
+    <T>(): Curried3<number, number, T[], T[]>;
+    <T>(begin: number): Curried2<number, T[], T[]>;
+    <T>(begin: number, end: number): Curried1<T[], T[]>;
+    <T>(begin: number, end: number, arr: T[]): T[];
+};
 
 /**
  * Reverse array

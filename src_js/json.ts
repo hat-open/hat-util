@@ -4,7 +4,7 @@ import { pipe } from './pipe';
 
 
 export type JArray = JData[];
-export type JObject = {[key: string]:  JData};
+export type JObject = {[key: string]: JData};
 export type JData = null | boolean | number | string | JArray | JObject;
 export type JPath = number | string | JPath[];
 

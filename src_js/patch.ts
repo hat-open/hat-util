@@ -105,7 +105,7 @@ function unescapePointerSegment(segment: string): string {
 }
 
 function parsePointer(pointer: string): Pointer {
-    if (pointer == "")
+    if (pointer == '')
         return [];
     const segments = pointer.split('/');
     if (segments[0] != '')
