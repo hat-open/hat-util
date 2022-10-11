@@ -122,7 +122,7 @@ export function clone<T>(x: T): T {
         return Array.from(x, clone) as T;
     if (isObject(x)) {
         const ret: {[key: string]: any} = {};
-        for (let i in x)
+        for (const i in x)
             ret[i] = clone(x[i]);
         return ret as T;
     }
@@ -422,7 +422,7 @@ export function _append<T>(
     val: T,
     arr: T[]
 ): T[] {
-    return arr.concat([val])
+    return arr.concat([val]);
 }
 
 /**
@@ -633,7 +633,7 @@ export function _findIndex<T>(
 export function _findIndex(fn: any, x: any) {
     if (isArray(x))
         return x.findIndex(fn);
-    for (let k in x)
+    for (const k in x)
         if (fn(x[k], k, x))
             return k;
 }

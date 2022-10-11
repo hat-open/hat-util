@@ -22,7 +22,7 @@ export function delay<TArgs extends [...any[]], TResult>(
     fn: (...args: TArgs) => TResult,
     t: number,
     ...args: TArgs
-    ): Promise<TResult> {
+): Promise<TResult> {
     return new Promise(resolve => {
         setTimeout(() => { resolve(fn(...args)); }, t || 0);
     });

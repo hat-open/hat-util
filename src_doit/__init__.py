@@ -6,7 +6,9 @@ from hat.doit import common
 from hat.doit.c import get_task_clang_format
 from hat.doit.docs import (build_sphinx,
                            build_pdoc)
-from hat.doit.js import build_npm
+from hat.doit.js import (build_npm,
+                         ESLintConf,
+                         run_eslint)
 from hat.doit.py import (build_wheel,
                          run_pytest,
                          run_flake8)
@@ -108,8 +110,9 @@ def task_check():
     """Check"""
     # TODO run eslint with ts
     return {'actions': [(run_flake8, [src_py_dir]),
-                        (run_flake8, [pytest_dir])],
-            'task_dep': ['build_ts']}
+                        (run_flake8, [pytest_dir]),
+                        (run_eslint, [src_js_dir, ESLintConf.TS])],
+            'task_dep': ['node_modules']}
 
 
 def task_format():

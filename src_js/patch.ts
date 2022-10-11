@@ -131,7 +131,7 @@ function _add(path: Pointer, val: JData, data: JData): JData {
             if (key == '-')
                 return [...data, val];
             const index = strictParseInt(key);
-            if (index == NaN || index > data.length - 1 || index < 0)
+            if (Number.isNaN(index) || index > data.length - 1 || index < 0)
                 throw Error("invalid array index");
             return [...islice(data, 0, index), val, ...islice(data, index)];
         }
@@ -144,7 +144,7 @@ function _add(path: Pointer, val: JData, data: JData): JData {
 
     if (isArray(data)) {
         const index = strictParseInt(key);
-        if (index == NaN || index > data.length - 1 || index < 0)
+        if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return [
             ...islice(data, 0, index),
@@ -172,7 +172,7 @@ function _remove(path: Pointer, data: JData): JData {
     if (path.length < 2) {
         if (isArray(data)) {
             const index = strictParseInt(key);
-            if (index == NaN || index > data.length - 1 || index < 0)
+            if (Number.isNaN(index) || index > data.length - 1 || index < 0)
                 throw Error("invalid array index");
             return [...islice(data, 0, index), ...islice(data, index + 1)];
         }
@@ -190,7 +190,7 @@ function _remove(path: Pointer, data: JData): JData {
 
     if (isArray(data)) {
         const index = strictParseInt(key);
-        if (index == NaN || index > data.length - 1 || index < 0)
+        if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return [
             ...islice(data, 0, index),
@@ -218,7 +218,7 @@ function _replace(path: Pointer, val: JData, data: JData): JData {
     if (path.length < 2) {
         if (isArray(data)) {
             const index = strictParseInt(key);
-            if (index == NaN || index > data.length - 1 || index < 0)
+            if (Number.isNaN(index) || index > data.length - 1 || index < 0)
                 throw Error("invalid array index");
             return [...islice(data, 0, index), val, ...islice(data, index + 1)];
         }
@@ -234,7 +234,7 @@ function _replace(path: Pointer, val: JData, data: JData): JData {
 
     if (isArray(data)) {
         const index = strictParseInt(key);
-        if (index == NaN || index > data.length - 1 || index < 0)
+        if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return [
             ...islice(data, 0, index),
@@ -261,7 +261,7 @@ function _get(path: Pointer, data: JData): JData {
 
     if (isArray(data)) {
         const index = strictParseInt(key);
-        if (index == NaN || index > data.length - 1 || index < 0)
+        if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return _get(path.slice(1), data[index]);
     }
