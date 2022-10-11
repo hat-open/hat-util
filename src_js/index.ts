@@ -5,3 +5,4 @@ export * from './patch';
 export * from './pipe';
 export * from './promise';
 export * from './timestamp';
+export * from './vnode';
