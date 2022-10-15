@@ -20,11 +20,11 @@ export function sleep(t: number): Promise<void> {
  */
 export function delay<TArgs extends [...any[]], TResult>(
     fn: (...args: TArgs) => TResult,
-    t: number,
+    t = 0,
     ...args: TArgs
 ): Promise<TResult> {
     return new Promise(resolve => {
-        setTimeout(() => { resolve(fn(...args)); }, t || 0);
+        setTimeout(() => { resolve(fn(...args)); }, t);
     });
 }
 
