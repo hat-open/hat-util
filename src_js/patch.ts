@@ -42,9 +42,11 @@ type Operation = OpAdd | OpRemove | OpReplace | OpMove | OpCopy | OpTest;
 
 type Pointer = string[];
 
+export type JPatch = Operation[];
+
 
 export const patch = curry((
-    diff: Operation[],
+    diff: JPatch,
     data: JData
 ): JData => {
     // @ts-ignore
