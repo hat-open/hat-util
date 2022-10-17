@@ -21,6 +21,8 @@ __all__ = ['task_clean_all',
            'task_build_js',
            'task_build_ts',
            'task_test',
+           'task_test_pytest',
+           'task_test_jest',
            'task_check',
            'task_format',
            'task_docs']
@@ -31,6 +33,7 @@ src_py_dir = Path('src_py')
 src_js_dir = Path('src_js')
 src_c_dir = Path('src_c')
 pytest_dir = Path('test_pytest')
+jest_dir = Path('test_jest')
 docs_dir = Path('docs')
 
 build_py_dir = build_dir / 'py'
@@ -102,8 +105,27 @@ def task_build_ts():
 
 def task_test():
     """Test"""
+    return {'actions': None,
+            'task_dep': ['test_pytest',
+                         'test_jest']}
+
+
+def task_test_pytest():
+    """Test pytest"""
     return {'actions': [lambda args: run_pytest(pytest_dir, *(args or []))],
             'pos_arg': 'args'}
+
+
+def task_test_jest():
+    """Test jest"""
+
+    def run():
+        subprocess.run([Path('node_modules/.bin/jest').resolve()],
+                       cwd=str(jest_dir),
+                       check=True)
+
+    return {'actions': [run],
+            'task_dep': ['node_modules']}
 
 
 def task_check():
@@ -111,7 +133,8 @@ def task_check():
     # TODO run eslint with ts
     return {'actions': [(run_flake8, [src_py_dir]),
                         (run_flake8, [pytest_dir]),
-                        (run_eslint, [src_js_dir, ESLintConf.TS])],
+                        (run_eslint, [src_js_dir, ESLintConf.TS]),
+                        (run_eslint, [jest_dir, ESLintConf.TS])],
             'task_dep': ['node_modules']}
 
 
