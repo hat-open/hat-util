@@ -62,6 +62,9 @@ test('omit', () => {
     expect(u.omit(['a', 2], data)).toEqual({a: [1, 2, {b: 'abc'}], c: true});
 
     expect(u.omit([], data)).toEqual(null);
+
+    expect(u.omit('b', data)).toEqual(data);
+    expect(u.omit(0, data)).toEqual(data);
 });
 
 
@@ -72,4 +75,6 @@ test('move', () => {
     expect(u.move(123, 321)).toBeInstanceOf(Function);
 
     expect(u.move('c', 'a', data)).toEqual({a: true});
+    expect(u.move('b', 'a', data)).toEqual({a: null, c: true});
+    expect(u.move(0, 'a', data)).toEqual({a: null, c: true});
 });

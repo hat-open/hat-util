@@ -77,7 +77,9 @@ export const omit = curry((
 ): JData => {
     function _omit(path: (number | string)[], x: JData) {
         if (isNumber(path[0])) {
-            const ret = (isArray(x) ? Array.from(x) : []);
+            if (!isArray(x))
+                return x;
+            const ret = Array.from(x);
             if (path.length > 1) {
                 ret[path[0]] = _omit(path.slice(1), ret[path[0]]);
             } else {
@@ -86,7 +88,9 @@ export const omit = curry((
             return ret;
         }
         if (isString(path[0])) {
-            const ret = (isObject(x) ? Object.assign({}, x) : {});
+            if (!isObject(x))
+                return x;
+            const ret = Object.assign({}, x);
             if (path.length > 1) {
                 ret[path[0]] = _omit(path.slice(1), ret[path[0]]);
             } else {
