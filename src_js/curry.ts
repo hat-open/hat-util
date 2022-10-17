@@ -66,7 +66,7 @@ export function curryN<TArgs extends any[], TResult>(
     function wrapper(prevArgs: any) {
         return function(...args: any[]) {
             const allArgs = [...prevArgs, ...args];
-            if (args.length >= arity)
+            if (allArgs.length >= arity)
                 return fn(...(allArgs as TArgs));
             return wrapper(allArgs);
         };

@@ -119,12 +119,13 @@ def task_test_pytest():
 def task_test_jest():
     """Test jest"""
 
-    def run():
-        subprocess.run([Path('node_modules/.bin/jest').resolve()],
+    def run(args):
+        subprocess.run([Path('node_modules/.bin/jest').resolve(), *args],
                        cwd=str(jest_dir),
                        check=True)
 
     return {'actions': [run],
+            'pos_arg': 'args',
             'task_dep': ['node_modules']}
 
 
