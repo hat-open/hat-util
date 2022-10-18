@@ -27,7 +27,7 @@ export function getVNodeChildren(node: VNode): VNodeChild[] {
 export function* flattenVNodeChildren(
     children: VNodeChild[]
 ): Generator<string | VNode, void, unknown> {
-    for (const child in children) {
+    for (const child of children) {
         if (isString(child) || isVNode(child)) {
             yield child;
         } else {

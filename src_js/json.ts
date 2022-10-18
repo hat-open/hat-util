@@ -55,7 +55,7 @@ export const change = curry((
             ret[first] = change(rest, ret[first]);
             return ret;
         }
-        throw 'invalid path';
+        throw Error('invalid path');
     })(flatten(path), x);
 });
 
@@ -98,7 +98,7 @@ export const omit = curry((
             }
             return ret;
         }
-        throw 'invalid path';
+        throw Error('invalid path');
     }
     const flatPath = flatten(path);
     if (flatPath.length < 1)

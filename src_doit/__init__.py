@@ -120,9 +120,7 @@ def task_test_jest():
     """Test jest"""
 
     def run(args):
-        subprocess.run([Path('node_modules/.bin/jest').resolve(),
-                        *(args or [])],
-                       cwd=str(jest_dir),
+        subprocess.run(['node_modules/.bin/jest', *(args or [])],
                        check=True)
 
     return {'actions': [run],
@@ -132,7 +130,6 @@ def task_test_jest():
 
 def task_check():
     """Check"""
-    # TODO run eslint with ts
     return {'actions': [(run_flake8, [src_py_dir]),
                         (run_flake8, [pytest_dir]),
                         (run_eslint, [src_js_dir, ESLintConf.TS]),

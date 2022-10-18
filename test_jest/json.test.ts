@@ -60,11 +60,13 @@ test('omit', () => {
     expect(u.omit('a', data)).toEqual({c: true});
 
     expect(u.omit(['a', 2], data)).toEqual({a: [1, 2, {b: 'abc'}], c: true});
+    expect(u.omit(['a', 2, 0], data)).toEqual({a: [1, 2, [123], {b: 'abc'}], c: true});
 
     expect(u.omit([], data)).toEqual(null);
 
     expect(u.omit('b', data)).toEqual(data);
     expect(u.omit(0, data)).toEqual(data);
+    expect(u.omit(['a', 'b'], data)).toEqual(data);
 });
 
 

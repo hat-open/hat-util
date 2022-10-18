@@ -56,7 +56,7 @@ export function createFuture<T>(): Future<T> {
         if (!data.done)
             throw new Error('future is not done');
         if (data.error)
-            throw data.error;
+            throw data.result;
         return data.result;
     };
 
