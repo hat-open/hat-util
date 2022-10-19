@@ -416,7 +416,7 @@ export function _append<T>(
     val: T,
     arr: T[]
 ): T[] {
-    return arr.concat([val]);
+    return [...arr, val];
 }
 
 /**
@@ -542,7 +542,7 @@ export const merge = curry(_merge) as {
 export function mergeAll<T extends Record<string, any>>(
     objs: T[]
 ): T {
-    return _reduce(merge<T>, {} as T, objs);
+    return Object.assign({}, ...objs);
 }
 
 /**
@@ -625,8 +625,10 @@ export function _findIndex<T>(
     obj: Record<string, T>
 ): string | undefined;
 export function _findIndex(fn: any, x: any) {
-    if (isArray(x))
-        return x.findIndex(fn);
+    if (isArray(x)) {
+        const index = x.findIndex(fn);
+        return (index >= 0 ? index : undefined);
+    }
     for (const k in x)
         if (fn(x[k], k, x))
             return k;
@@ -696,11 +698,12 @@ export function _union<T>(
     x: T[],
     y: T[]
 ): T[] {
-    return _reduce((acc: T[], val: T) => {
-        if (!_find(equals(val), x))
-            acc = _append(val, acc);
-        return acc;
-    }, x, y);
+    const result: T[] = [];
+    for (const arr of [x, y])
+        for (const i of arr)
+            if (!_find(equals(i), result))
+                result.push(i);
+    return result;
 }
 
 /**
@@ -713,7 +716,7 @@ export const union = curry(_union) as {
 };
 
 /**
- * Check if array contains value
+ * Check if array contains value using `equals` to check equality
  *
  * TODO: add support for objects (should we check for keys or values?)
  */
@@ -721,7 +724,10 @@ export function _contains<T>(
     val: T,
     arr: T[]
 ): boolean {
-    return arr.includes(val);
+    for (const i of arr)
+        if (_equals(val, i))
+            return true;
+    return false;
 }
 
 /**
@@ -741,7 +747,7 @@ export function _insert<T>(
     val: T,
     arr: T[]
 ): T[] {
-    return arr.slice(0, idx).concat([val], arr.slice(idx));
+    return [...arr.slice(0, idx), val, ...arr.slice(idx)];
 }
 
 /**

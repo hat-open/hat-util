@@ -43,6 +43,11 @@ test("getVNodeChildren", () => {
 });
 
 
+test("getFlatVNodeChildren", () => {
+    expect(u.getFlatVNodeChildren(vt)).toEqual([vt[1], vt[2], vt[4]]);
+});
+
+
 test("flattenVNodeChildren", () => {
     const childern = u.pipe(
         u.getVNodeChildren,
@@ -51,3 +56,15 @@ test("flattenVNodeChildren", () => {
     )(vt);
     expect(childern).toEqual([vt[1], vt[2], vt[4]]);
 });
+
+
+test.todo('changeVNodeData');
+
+
+test.todo('changeVNodeChildren');
+
+
+test.todo('queryVNodePath');
+
+
+test.todo('queryAllVNodePaths');

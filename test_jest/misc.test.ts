@@ -267,55 +267,153 @@ test('pick', () => {
 });
 
 
-test.todo('map');
+test('map', () => {
+    expect(u.map(u.inc, [])).toEqual([]);
+    expect(u.map(u.inc, [1, 2, 3])).toEqual([2, 3, 4]);
+
+    expect(u.map(u.inc, {})).toEqual({});
+    expect(u.map(u.inc, {a: 1, b: 2, c: 3})).toEqual({a: 2, b: 3, c: 4});
+});
 
 
-test.todo('filter');
+test('filter', () => {
+    const even = (x: number) => x % 2 == 0;
+
+    expect(u.filter(even, [])).toEqual([]);
+    expect(u.filter(even, [1, 2, 3, 4])).toEqual([2, 4]);
+});
 
 
-test.todo('append');
+test('append', () => {
+    expect(u.append(1, [])).toEqual([1]);
+    expect(u.append(123, [1, 2, 3])).toEqual([1, 2, 3, 123]);
+});
 
 
-test.todo('reduce');
+test('reduce', () => {
+    const sum = (acc: number, i: number) => acc + i;
+
+    expect(u.reduce(sum, 0, [])).toEqual(0);
+    expect(u.reduce(sum, 0, [1, 2, 3])).toEqual(6);
+
+    expect(u.reduce(sum, 0, {})).toEqual(0);
+    expect(u.reduce(sum, 0, {a: 1, b: 2, c: 3})).toEqual(6);
+});
 
 
-test.todo('merge');
+test('merge', () => {
+    expect(u.merge({}, {})).toEqual({});
+    expect(u.merge({a: 1}, {b: 2})).toEqual({a: 1, b: 2});
+    expect(u.merge({a: 1}, {a: 2})).toEqual({a: 2});
+});
 
 
-test.todo('mergeAll');
+test('mergeAll', () => {
+    expect(u.mergeAll([{}])).toEqual({});
+    expect(u.mergeAll([{a: 1}, {b: 2}, {c: 3}])).toEqual({a: 1, b: 2, c: 3});
+    expect(u.mergeAll([{a: 1}, {a: 2}, {a: 3}])).toEqual({a: 3});
+});
 
 
-test.todo('find');
+test('find', () => {
+    const even = (x: number) => x % 2 == 0;
+
+    expect(u.find(even, [])).toBeUndefined();
+    expect(u.find(even, [1, 3, 5])).toBeUndefined();
+    expect(u.find(even, [1, 2, 3])).toEqual(2);
+
+    expect(u.find(even, {})).toBeUndefined();
+    expect(u.find(even, {a: 1, b: 3, c: 5})).toBeUndefined();
+    expect(u.find(even, {a: 1, b: 2, c: 3})).toEqual(2);
+});
 
 
-test.todo('findIndex');
+test('findIndex', () => {
+    const even = (x: number) => x % 2 == 0;
+
+    expect(u.findIndex(even, [])).toBeUndefined();
+    expect(u.findIndex(even, [1, 3, 5])).toBeUndefined();
+    expect(u.findIndex(even, [1, 2, 3])).toEqual(1);
+
+    expect(u.findIndex(even, {})).toBeUndefined();
+    expect(u.findIndex(even, {a: 1, b: 3, c: 5})).toBeUndefined();
+    expect(u.findIndex(even, {a: 1, b: 2, c: 3})).toEqual('b');
+});
 
 
-test.todo('concat');
+test('concat', () => {
+    expect(u.concat([], [])).toEqual([]);
+    expect(u.concat([1], [])).toEqual([1]);
+    expect(u.concat([], [1])).toEqual([1]);
+    expect(u.concat([1], [2])).toEqual([1, 2]);
+});
 
 
-test.todo('union');
+test('union', () => {
+    expect(u.union([], [])).toEqual([]);
+    expect(u.union([1, 2, 3], [2, 3, 4])).toEqual([1, 2, 3, 4]);
+    expect(u.union([1, 2, 1], [2, 3, 2])).toEqual([1, 2, 3]);
+});
 
 
-test.todo('contains');
+test('contains', () => {
+    expect(u.contains(123, [])).toBe(false);
+    expect(u.contains(2, [1, 2, 3])).toBe(true);
+    expect(u.contains(4, [1, 2, 3])).toBe(false);
+    expect(u.contains([], [1, [], 3])).toBe(true);
+});
 
 
-test.todo('insert');
+test('insert', () => {
+    expect(u.insert(0, 123, [])).toEqual([123]);
+    expect(u.insert(1, 'a', [1, 2] as any)).toEqual([1, 'a', 2]);
+    expect(u.insert(123, 42, [])).toEqual([42]);
+});
 
 
-test.todo('slice');
+test('slice', () => {
+    expect(u.slice(0, 0, [])).toEqual([]);
+    expect(u.slice(0, 0, [1, 2, 3])).toEqual([]);
+    expect(u.slice(1, 2, [1, 2, 3])).toEqual([2]);
+    expect(u.slice(0, 123, [1, 2, 3])).toEqual([1, 2, 3]);
+});
 
 
-test.todo('reverse');
+test('reverse', () => {
+    expect(u.reverse([])).toEqual([]);
+    expect(u.reverse([1])).toEqual([1]);
+    expect(u.reverse([1, 2, 3])).toEqual([3, 2, 1]);
+});
 
 
-test.todo('length');
+test('length', () => {
+    expect(u.length([])).toEqual(0);
+    expect(u.length([1])).toEqual(1);
+    expect(u.length([1, 2, 3])).toEqual(3);
+});
 
 
-test.todo('inc');
+test('inc', () => {
+    expect(u.inc(0)).toEqual(1);
+    expect(u.inc(1)).toEqual(2);
+    expect(u.inc(1.5)).toEqual(2.5);
+});
 
 
-test.todo('dec');
+test('dec', () => {
+    expect(u.dec(0)).toEqual(-1);
+    expect(u.dec(1)).toEqual(0);
+    expect(u.dec(1.5)).toEqual(0.5);
+});
 
 
-test.todo('not');
+test('not', () => {
+    expect(u.not(true)).toBe(false);
+    expect(u.not(false)).toBe(true);
+    expect(u.not(0)).toBe(true);
+    expect(u.not(1)).toBe(false);
+    expect(u.not(null)).toBe(true);
+    expect(u.not('')).toBe(true);
+    expect(u.not([])).toBe(false);
+    expect(u.not({})).toBe(false);
+});
