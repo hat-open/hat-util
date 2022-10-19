@@ -49,8 +49,7 @@ export const patch = curry((
     diff: JPatch,
     data: JData
 ): JData => {
-    // @ts-ignore
-    const reducer = (acc: JData, i: Operation) => operations[i.op](i, acc);
+    const reducer = (acc: JData, i: Operation) => operations[i.op](i as any, acc);
     return diff.reduce(reducer, data);
 });
 

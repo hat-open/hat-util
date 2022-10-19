@@ -38,8 +38,7 @@ export function pipe(first?: any, ...rest: any[]) {
     return function (...args: any[]) {
         if (!first)
             return args[0];
-        // @ts-ignore
-        let ret = first.apply(this, args);
+        let ret = first(...args);
         for (const fn of rest)
             ret = fn(ret);
         return ret;

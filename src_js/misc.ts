@@ -85,7 +85,7 @@ export function isArray(x: unknown): x is unknown[] {
  * `isBoolean`, `isInteger`, `isNumber`, `isString`, and `isArray` will return
  * `false`.
  */
-export function isObject(x: unknown): x is {[key: string]: unknown} {
+export function isObject(x: unknown): x is Record<string, unknown> {
     return typeof(x) == 'object' && !isArray(x) && !isNil(x);
 }
 
@@ -121,7 +121,7 @@ export function clone<T>(x: T): T {
     if (isArray(x))
         return Array.from(x, clone) as T;
     if (isObject(x)) {
-        const ret: {[key: string]: any} = {};
+        const ret: Record<string, any> = {};
         for (const i in x)
             ret[i] = clone(x[i]);
         return ret as T;
@@ -140,7 +140,7 @@ export function zip<T1, T2>(
     arr2: T2[]
 ): [T1, T2][] {
     return Array.from((function*() {
-        for (let i = 0; i < arr1.length || i < arr2.length; ++i)
+        for (let i = 0; i < arr1.length && i < arr2.length; ++i)
             yield [arr1[i], arr2[i]];
     })());
 }
@@ -149,7 +149,7 @@ export function zip<T1, T2>(
  * Convert object to array of key, value pairs
  */
 export function toPairs<T>(
-    obj: {[key: string]: T}
+    obj: Record<string, T>
 ): [string, T][] {
     return Object.entries(obj);
 }
@@ -159,11 +159,8 @@ export function toPairs<T>(
  */
 export function fromPairs<T>(
     arr: [string, T][]
-): {[key: string]: T} {
-    const ret: {[key: string]: T} = {};
-    for (const [k, v] of arr)
-        ret[k] = v;
-    return ret;
+): Record<string, T> {
+    return Object.fromEntries(arr);
 }
 
 /**
@@ -187,8 +184,7 @@ export function flatten(arr: any): any[] {
 export function flap<T extends [...any]>(
     ...fns: ((...args: T) => any)[]
 ): ((...args: T) => any[]) {
-    // @ts-ignore
-    return (...args) => fns.map(fn => fn.apply(this, args));
+    return (...args) => fns.map(fn => fn(...args));
 }
 
 /**
@@ -208,8 +204,8 @@ export function _equals(
     if (Array.isArray(x) && Array.isArray(y)) {
         if (x.length != y.length)
             return false;
-        for (const [a, b] of zip(x, y)) {
-            if (!_equals(a, b))
+        for (let i = 0; i < x.length && i < y.length; ++i) {
+            if (!_equals(x[i], y[i]))
                 return false;
         }
         return true;
@@ -280,7 +276,6 @@ export const sort = curry(_sort) as {
 
 /**
  * Sort array based on results of appling function to it's elements
- * (curried function)
  *
  * Resulting order is determined by comparring function application results
  * with greater then and lesser then operators.
@@ -312,14 +307,13 @@ export const sortBy = curry(_sortBy) as {
 /**
  * Create object containing only subset of selected properties
  */
-export function _pick<T extends {[key: string]: any}>(
-    arr: string[],
+export function _pick<T extends Record<string, any>>(
+    arr: (keyof T)[],
     obj: T
 ): T {
     const ret = {} as T;
     for (const i of arr) {
         if (i in obj) {
-            // @ts-ignore
             ret[i] = obj[i];
         }
     }
@@ -330,9 +324,9 @@ export function _pick<T extends {[key: string]: any}>(
  * Curried `_pick`
  */
 export const pick = curry(_pick) as {
-    <T extends {[key: string]: any}>(): Curried2<string[], T, T>;
-    <T extends {[key: string]: any}>(arr: string[]): Curried1<T, T>;
-    <T extends {[key: string]: any}>(arr: string[], obj: T): T;
+    <T extends Record<string, any>>(): Curried2<string[], T, T>;
+    <T extends Record<string, any>>(arr: string[]): Curried1<T, T>;
+    <T extends Record<string, any>>(arr: string[], obj: T): T;
 };
 
 /**
@@ -346,9 +340,9 @@ export function _map<T1, T2>(
     arr: T1[]
 ): T2[];
 export function _map<T1, T2>(
-    fn: ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
-    obj: {[key: string]: T1}
-): {[key: string]: T2};
+    fn: ((val: T1, key?: string, obj?: Record<string, T1>) => T2),
+    obj: Record<string, T1>
+): Record<string, T2>;
 export function _map(fn: any, x: any) {
     if (isArray(x))
         return x.map(fn);
@@ -369,9 +363,9 @@ export const map = curry(_map) as {
             T2[]
         > |
         Curried2<
-            ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
-            {[key: string]: T1},
-            {[key: string]: T2}
+            ((val: T1, key?: string, obj?: Record<string, T1>) => T2),
+            Record<string, T1>,
+            Record<string, T2>
         >
     );
     <T1, T2>(
@@ -381,19 +375,19 @@ export const map = curry(_map) as {
         T2[]
     >;
     <T1, T2>(
-        fn: ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2)
+        fn: ((val: T1, key?: string, obj?: Record<string, T1>) => T2)
     ): Curried1<
-        {[key: string]: T1},
-        {[key: string]: T2}
+        Record<string, T1>,
+        Record<string, T2>
     >;
     <T1, T2>(
         fn: ((val: T1, index?: number, arr?: T1[]) => T2),
         arr: T1[]
     ): T2[];
     <T1, T2>(
-        fn: ((val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
-        obj: {[key: string]: T1}
-    ): {[key: string]: T2};
+        fn: ((val: T1, key?: string, obj?: Record<string, T1>) => T2),
+        obj: Record<string, T1>
+    ): Record<string, T2>;
 };
 
 /**
@@ -446,9 +440,9 @@ export function _reduce<T1, T2>(
     arr: T1[]
 ): T2;
 export function _reduce<T1, T2>(
-    fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+    fn: ((acc: T2, val: T1, key?: string, obj?: Record<string, T1>) => T2),
     val: T2,
-    obj: {[key: string]: T1}
+    obj: Record<string, T1>
 ): T2;
 export function _reduce(fn: any, val: any, x: any) {
     if (isArray(x))
@@ -471,9 +465,9 @@ export const reduce = curry(_reduce) as {
             T2
         > |
         Curried3<
-            ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+            ((acc: T2, val: T1, key?: string, obj?: Record<string, T1>) => T2),
             T2,
-            {[key: string]: T1},
+            Record<string, T1>,
             T2
         >
     );
@@ -485,10 +479,10 @@ export const reduce = curry(_reduce) as {
         T2
     >;
     <T1, T2>(
-        fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2)
+        fn: ((acc: T2, val: T1, key?: string, obj?: Record<string, T1>) => T2)
     ): Curried2<
         T2,
-        {[key: string]: T1},
+        Record<string, T1>,
         T2
     >;
     <T1, T2>(
@@ -499,10 +493,10 @@ export const reduce = curry(_reduce) as {
         T2
     >;
     <T1, T2>(
-        fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+        fn: ((acc: T2, val: T1, key?: string, obj?: Record<string, T1>) => T2),
         val: T2
     ): Curried1<
-        {[key: string]: T1},
+        Record<string, T1>,
         T2
     >;
     <T1, T2>(
@@ -511,9 +505,9 @@ export const reduce = curry(_reduce) as {
         arr: T1[]
     ): T2;
     <T1, T2>(
-        fn: ((acc: T2, val: T1, key?: string, obj?: {[key: string]: T1}) => T2),
+        fn: ((acc: T2, val: T1, key?: string, obj?: Record<string, T1>) => T2),
         val: T2,
-        obj: {[key: string]: T1}
+        obj: Record<string, T1>
     ): T2;
 };
 
@@ -523,7 +517,7 @@ export const reduce = curry(_reduce) as {
  * If same property exist in both arguments, second argument's value is used
  * as resulting value
  */
-export function _merge<T extends {[key: string]: any}>(
+export function _merge<T extends Record<string, any>>(
     x: T,
     y: T
 ): T {
@@ -534,9 +528,9 @@ export function _merge<T extends {[key: string]: any}>(
  * Curried `_merge`
  */
 export const merge = curry(_merge) as {
-    <T extends {[key: string]: any}>(): Curried2<T, T, T>;
-    <T extends {[key: string]: any}>(x: T): Curried1<T, T>;
-    <T extends {[key: string]: any}>(x: T, y: T): T;
+    <T extends Record<string, any>>(): Curried2<T, T, T>;
+    <T extends Record<string, any>>(x: T): Curried1<T, T>;
+    <T extends Record<string, any>>(x: T, y: T): T;
 };
 
 /**
@@ -545,7 +539,7 @@ export const merge = curry(_merge) as {
  * If same property exist in multiple arguments, value from the last argument
  * containing that property is used
  */
-export function mergeAll<T extends {[key: string]: any}>(
+export function mergeAll<T extends Record<string, any>>(
     objs: T[]
 ): T {
     return _reduce(merge<T>, {} as T, objs);
@@ -564,8 +558,8 @@ export function _find<T>(
     arr: T[]
 ): T | undefined;
 export function _find<T>(
-    fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
-    obj: {[key: string]: T}
+    fn: ((val: T, key?: string, obj?: Record<string, T>) => boolean),
+    obj: Record<string, T>
 ): T | undefined;
 export function _find(fn: any, x: any) {
     if (isArray(x))
@@ -586,8 +580,8 @@ export const find = curry(_find) as {
             T | undefined
         > |
         Curried2<
-            ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
-            {[key: string]: T},
+            ((val: T, key?: string, obj?: Record<string, T>) => boolean),
+            Record<string, T>,
             T | undefined
         >
     );
@@ -598,9 +592,9 @@ export const find = curry(_find) as {
         T | undefined
     >;
     <T>(
-        fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean)
+        fn: ((val: T, key?: string, obj?: Record<string, T>) => boolean)
     ): Curried1<
-        {[key: string]: T},
+        Record<string, T>,
         T | undefined
     >;
     <T>(
@@ -608,8 +602,8 @@ export const find = curry(_find) as {
         arr: T[]
     ): T | undefined;
     <T>(
-        fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
-        obj: {[key: string]: T}
+        fn: ((val: T, key?: string, obj?: Record<string, T>) => boolean),
+        obj: Record<string, T>
     ): T | undefined;
 };
 
@@ -627,8 +621,8 @@ export function _findIndex<T>(
     arr: T[]
 ): number | undefined;
 export function _findIndex<T>(
-    fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
-    obj: {[key: string]: T}
+    fn: ((val: T, key?: string, obj?: Record<string, T>) => boolean),
+    obj: Record<string, T>
 ): string | undefined;
 export function _findIndex(fn: any, x: any) {
     if (isArray(x))
@@ -649,8 +643,8 @@ export const findIndex = curry(_findIndex) as {
             number | undefined
         > |
         Curried2<
-            ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
-            {[key: string]: T},
+            ((val: T, key?: string, obj?: Record<string, T>) => boolean),
+            Record<string, T>,
             string | undefined
         >
     );
@@ -661,9 +655,9 @@ export const findIndex = curry(_findIndex) as {
         number | undefined
     >;
     <T>(
-        fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean)
+        fn: ((val: T, key?: string, obj?: Record<string, T>) => boolean)
     ): Curried1<
-        {[key: string]: T},
+        Record<string, T>,
         string | undefined
     >;
     <T>(
@@ -671,8 +665,8 @@ export const findIndex = curry(_findIndex) as {
         arr: T[]
     ): number | undefined;
     <T>(
-        fn: ((val: T, key?: string, obj?: {[key: string]: T}) => boolean),
-        obj: {[key: string]: T}
+        fn: ((val: T, key?: string, obj?: Record<string, T>) => boolean),
+        obj: Record<string, T>
     ): string | undefined;
 };
 
