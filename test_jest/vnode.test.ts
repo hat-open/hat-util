@@ -58,7 +58,16 @@ test("flattenVNodeChildren", () => {
 });
 
 
-test.todo('changeVNodeData');
+test('changeVNodeData', () => {
+    const fn = (x: u.VNodeData | null) => ({xyz: (x ? x.xyz + 1 : 42)});
+
+    expect(u.changeVNodeData(fn, vt[1] as u.VNode)).toEqual(
+        ['div', {xyz: 42}, 'a1']
+    );
+    expect(u.changeVNodeData(fn, vt[4] as u.VNode)).toEqual(
+        ['div', {xyz: 124}, 'a3']
+    );
+});
 
 
 test.todo('changeVNodeChildren');
@@ -68,3 +77,15 @@ test.todo('queryVNodePath');
 
 
 test.todo('queryAllVNodePaths');
+
+
+test.todo('getVNode');
+
+
+test.todo('changeVNode');
+
+
+test.todo('setVNode');
+
+
+test.todo('omitVNode');

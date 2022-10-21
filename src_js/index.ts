@@ -1,4 +1,5 @@
 export * from './curry';
+export * from './iter';
 export * from './json';
 export * from './misc';
 export * from './patch';

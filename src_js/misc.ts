@@ -765,20 +765,20 @@ export const insert = curry(_insert) as {
  */
 export function _slice<T>(
     begin: number,
-    end: number,
+    end: number | null,
     arr: T[]
 ): T[] {
-    return arr.slice(begin, end);
+    return arr.slice(begin, (end != null ? end : undefined));
 }
 
 /**
  * Curried `_slice`
  */
 export const slice = curry(_slice) as {
-    <T>(): Curried3<number, number, T[], T[]>;
-    <T>(begin: number): Curried2<number, T[], T[]>;
-    <T>(begin: number, end: number): Curried1<T[], T[]>;
-    <T>(begin: number, end: number, arr: T[]): T[];
+    <T>(): Curried3<number, number | null, T[], T[]>;
+    <T>(begin: number): Curried2<number | null, T[], T[]>;
+    <T>(begin: number, end: number | null): Curried1<T[], T[]>;
+    <T>(begin: number, end: number | null, arr: T[]): T[];
 };
 
 /**

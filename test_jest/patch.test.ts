@@ -14,13 +14,70 @@ test('empty', () => {
 });
 
 
-test.todo('add');
+test('add', () => {
+    expect(u.patch([{
+        op: 'add',
+        path: '',
+        value: 42
+    }], data)).toEqual(42);
+
+    expect(u.patch([{
+        op: 'add',
+        path: '/a/3/b',
+        value: 'cba'
+    }], data)).toEqual(u.set(['a', 3, 'b'], 'cba', data));
+
+    expect(u.patch([{
+        op: 'add',
+        path: '/a/2/0/-',
+        value: 42
+    }], data)).toEqual(u.set(['a', 2, 0, 0], 42, data));
+
+    expect(u.patch([{
+        op: 'add',
+        path: '/a/2/0',
+        value: 321
+    }], data)).toEqual(u.set(['a', 2], [321, [], 123], data));
+});
 
 
-test.todo('remove');
+test('remove', () => {
+    expect(u.patch([{
+        op: 'remove',
+        path: ''
+    }], data)).toEqual(null);
+
+    expect(u.patch([{
+        op: 'remove',
+        path: '/a/3/b'
+    }], data)).toEqual(u.omit(['a', 3, 'b'], data));
+
+    expect(u.patch([{
+        op: 'remove',
+        path: '/a/2/0'
+    }], data)).toEqual(u.omit(['a', 2, 0], data));
+});
 
 
-test.todo('replace');
+test('replace', () => {
+    expect(u.patch([{
+        op: 'replace',
+        path: '',
+        value: 42
+    }], data)).toEqual(42);
+
+    expect(u.patch([{
+        op: 'replace',
+        path: '/a/3/b',
+        value: 'cba'
+    }], data)).toEqual(u.set(['a', 3, 'b'], 'cba', data));
+
+    expect(u.patch([{
+        op: 'replace',
+        path: '/a/2/0',
+        value: 321
+    }], data)).toEqual(u.set(['a', 2, 0], 321, data));
+});
 
 
 test.todo('move');

@@ -1,5 +1,5 @@
 import { curry } from './curry';
-import { JPath } from './json';
+import { _get, _change, _omit } from './json';
 import { isString, isArray, isObject, isNil } from './misc';
 
 
@@ -8,6 +8,7 @@ export type VNodeWithoutData = [string, ...VNodeChild[]];
 export type VNodeWithData = [string, VNodeData, ...VNodeChild[]];
 export type VNodeData = Record<string, any>;
 export type VNodeChild = string | VNode | VNodeChild[];
+export type VNodePath = number | VNodePath[];
 
 
 export function isVNodeWithoutData(node: VNode): node is VNodeWithoutData {
@@ -84,7 +85,7 @@ export const changeVNodeChildren = curry(_changeVNodeChildren);
 export function _queryVNodePath(
     selector: string,
     tree: VNodeChild
-): JPath | null {
+): VNodePath | null {
     const first = _queryAllVNodePaths(selector, tree).next();
     return (first.done ? null : first.value);
 }
@@ -94,7 +95,7 @@ export const queryVNodePath = curry(_queryVNodePath);
 export function* _queryAllVNodePaths(
     selector: string,
     tree: VNodeChild
-): Generator<JPath> {
+): Generator<VNodePath> {
     if (isString(tree))
         return;
     if (isVNode(tree) && testSelector(selector, tree))
@@ -105,10 +106,60 @@ export function* _queryAllVNodePaths(
     );
     for (let i = childrenStart; i < tree.length; ++i)
         for (const path of _queryAllVNodePaths(selector, tree[i] as VNodeChild))
-            yield [i, ...(path as JPath[])];
+            yield [i, ...(path as VNodePath[])];
 }
 
 export const queryAllVNodePaths = curry(_queryAllVNodePaths);
+
+export function _getVNode(
+    path: VNodePath,
+    tree: VNodeChild
+): VNode | null {
+    const node = _get(path, tree) as VNodeChild;
+    return (isVNode(node) ? node : null);
+}
+
+export const getVNode = curry(_getVNode);
+
+export function _changeVNode(
+    path: VNodePath,
+    fn: (val: VNode) => VNode,
+    tree: VNodeChild
+): VNodeChild {
+    return _change(
+        path,
+        node => (isVNode(node as VNodeChild) ? fn(node as VNode) : node),
+        tree
+    ) as VNodeChild;
+}
+
+export const changeVNode = curry(_changeVNode);
+
+export function _setVNode(
+    path: VNodePath,
+    node: VNode,
+    tree: VNodeChild
+): VNodeChild {
+    return _change(
+        path,
+        x => (isArray(x) || isString(x) ? node : x),
+        tree
+    ) as VNodeChild;
+}
+
+export const setVNode = curry(_setVNode);
+
+export function _omitVNode(
+    path: VNodePath,
+    tree: VNodeChild
+): VNodeChild {
+    if (isNil(_getVNode(path, tree)))
+        return tree;
+    return _omit(path, tree) as VNodeChild;
+}
+
+export const omitVNode = curry(_omitVNode);
+
 
 function testSelector(selector: string, node: VNode): boolean {
     selector as any;

@@ -1,74 +1,76 @@
 import { curry } from './curry';
+import { _islice } from './iter';
 import { JData } from './json';
 import { isArray, isObject, strictParseInt, equals } from './misc';
 
 
-type OpAdd = {
+export type JPatchOpAdd = {
     op: 'add',
     path: string,
     value: JData
 };
 
-type OpRemove = {
+export type JPatchOpRemove = {
     op: 'remove',
     path: string
 };
 
-type OpReplace = {
+export type JPatchOpReplace = {
     op: 'replace',
     path: string,
     value: JData
 };
 
-type OpMove = {
+export type JPatchOpMove = {
     op: 'move',
     from: string,
     path: string
 };
 
-type OpCopy = {
+export type JPatchOpCopy = {
     op: 'copy',
     from: string,
     path: string
 };
 
-type OpTest = {
+export type JPatchOpTest = {
     op: 'test',
     path: string,
     value: JData
 };
 
-type Operation = OpAdd | OpRemove | OpReplace | OpMove | OpCopy | OpTest;
+export type JPatchOp = JPatchOpAdd | JPatchOpRemove | JPatchOpReplace |
+                       JPatchOpMove | JPatchOpCopy | JPatchOpTest;
 
-type Pointer = string[];
+export type JPatch = JPatchOp[];
 
-export type JPatch = Operation[];
+type JPatchPointer = string[];
 
 
 export const patch = curry((
     diff: JPatch,
     data: JData
 ): JData => {
-    const reducer = (acc: JData, i: Operation) => operations[i.op](i as any, acc);
+    const reducer = (acc: JData, i: JPatchOp) => operations[i.op](i as any, acc);
     return diff.reduce(reducer, data);
 });
 
-function opAdd(op: OpAdd, data: JData): JData {
+function opAdd(op: JPatchOpAdd, data: JData): JData {
     const path = parsePointer(op.path);
     return _add(path, op.value, data);
 }
 
-function opRemove(op: OpRemove, data: JData): JData {
+function opRemove(op: JPatchOpRemove, data: JData): JData {
     const path = parsePointer(op.path);
     return _remove(path, data);
 }
 
-function opReplace(op: OpReplace, data: JData): JData {
+function opReplace(op: JPatchOpReplace, data: JData): JData {
     const path = parsePointer(op.path);
     return _replace(path, op.value, data);
 }
 
-function opMove(op: OpMove, data: JData): JData {
+function opMove(op: JPatchOpMove, data: JData): JData {
     const from = parsePointer(op.from);
     const path = parsePointer(op.path);
     if (path.length > from.length && equals(from, path.slice(0, from.length)))
@@ -77,14 +79,14 @@ function opMove(op: OpMove, data: JData): JData {
     return _add(path, val, _remove(from, data));
 }
 
-function opCopy(op: OpCopy, data: JData): JData {
+function opCopy(op: JPatchOpCopy, data: JData): JData {
     const from = parsePointer(op.from);
     const path = parsePointer(op.path);
     const val = _get(from, data);
     return _add(path, val, data);
 }
 
-function opTest(op: OpTest, data: JData): JData {
+function opTest(op: JPatchOpTest, data: JData): JData {
     const path = parsePointer(op.path);
     const val = _get(path, data);
     if (!equals(val, op.value))
@@ -105,7 +107,7 @@ function unescapePointerSegment(segment: string): string {
     return segment.replaceAll('~1', '/').replaceAll('~0', '~');
 }
 
-function parsePointer(pointer: string): Pointer {
+function parsePointer(pointer: string): JPatchPointer {
     if (pointer == '')
         return [];
     const segments = pointer.split('/');
@@ -114,14 +116,7 @@ function parsePointer(pointer: string): Pointer {
     return segments.slice(1).map(unescapePointerSegment);
 }
 
-function* islice<T>(x: T[], start: number, stop?: number) {
-    if (stop === undefined || stop > x.length)
-        stop = x.length;
-    for (let i = start; start < stop; i += 1)
-        yield x[i];
-}
-
-function _add(path: Pointer, val: JData, data: JData): JData {
+function _add(path: JPatchPointer, val: JData, data: JData): JData {
     if (path.length < 1)
         return val;
 
@@ -134,7 +129,11 @@ function _add(path: Pointer, val: JData, data: JData): JData {
             const index = strictParseInt(key);
             if (Number.isNaN(index) || index > data.length - 1 || index < 0)
                 throw Error("invalid array index");
-            return [...islice(data, 0, index), val, ...islice(data, index)];
+            return [
+                ..._islice(0, index, data),
+                val,
+                ..._islice(index, null, data)
+            ];
         }
 
         if (isObject(data))
@@ -148,9 +147,9 @@ function _add(path: Pointer, val: JData, data: JData): JData {
         if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return [
-            ...islice(data, 0, index),
+            ..._islice(0, index, data),
             _add(path.slice(1), val, data[index]),
-            ...islice(data, index + 1)
+            ..._islice(index + 1, null, data)
         ];
     }
 
@@ -164,7 +163,7 @@ function _add(path: Pointer, val: JData, data: JData): JData {
     throw Error("invalid data type");
 }
 
-function _remove(path: Pointer, data: JData): JData {
+function _remove(path: JPatchPointer, data: JData): JData {
     if (path.length < 1)
         return null;
 
@@ -175,7 +174,10 @@ function _remove(path: Pointer, data: JData): JData {
             const index = strictParseInt(key);
             if (Number.isNaN(index) || index > data.length - 1 || index < 0)
                 throw Error("invalid array index");
-            return [...islice(data, 0, index), ...islice(data, index + 1)];
+            return [
+                ..._islice(0, index, data),
+                ..._islice(index + 1, null, data)
+            ];
         }
 
         if (isObject(data)) {
@@ -194,9 +196,9 @@ function _remove(path: Pointer, data: JData): JData {
         if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return [
-            ...islice(data, 0, index),
+            ..._islice(0, index, data),
             _remove(path.slice(1), data[index]),
-            ...islice(data, index + 1)
+            ..._islice(index + 1, null, data)
         ];
     }
 
@@ -210,7 +212,7 @@ function _remove(path: Pointer, data: JData): JData {
     throw Error("invalid data type");
 }
 
-function _replace(path: Pointer, val: JData, data: JData): JData {
+function _replace(path: JPatchPointer, val: JData, data: JData): JData {
     if (path.length < 1)
         return val;
 
@@ -221,7 +223,10 @@ function _replace(path: Pointer, val: JData, data: JData): JData {
             const index = strictParseInt(key);
             if (Number.isNaN(index) || index > data.length - 1 || index < 0)
                 throw Error("invalid array index");
-            return [...islice(data, 0, index), val, ...islice(data, index + 1)];
+            return [
+                ..._islice(0, index, data),
+                val,
+                ..._islice(index + 1, null, data)];
         }
 
         if (isObject(data)) {
@@ -238,9 +243,9 @@ function _replace(path: Pointer, val: JData, data: JData): JData {
         if (Number.isNaN(index) || index > data.length - 1 || index < 0)
             throw Error("invalid array index");
         return [
-            ...islice(data, 0, index),
+            ..._islice(0, index, data),
             _replace(path.slice(1), val, data[index]),
-            ...islice(data, index + 1)
+            ..._islice(index + 1, null, data)
         ];
     }
 
@@ -254,7 +259,7 @@ function _replace(path: Pointer, val: JData, data: JData): JData {
     throw Error("invalid data type");
 }
 
-function _get(path: Pointer, data: JData): JData {
+function _get(path: JPatchPointer, data: JData): JData {
     if (path.length < 1)
         return data;
 
