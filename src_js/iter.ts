@@ -7,16 +7,16 @@ export function* _islice<T>(
     x: T[]
 ): Generator<T> {
     if (start < 0) {
-        start = x.length - start;
+        start = x.length + start;
         if (start < 0)
             start = 0;
     }
     if (stop == null || stop > x.length) {
         stop = x.length;
     } else if (stop < 0) {
-        stop = x.length - stop;
+        stop = x.length + stop;
     }
-    for (let i = start; i < stop; i += 1)
+    for (let i = start; i < stop; ++i)
         yield x[i];
 }
 

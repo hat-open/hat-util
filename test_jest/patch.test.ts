@@ -80,10 +80,46 @@ test('replace', () => {
 });
 
 
-test.todo('move');
+test('move', () => {
+    expect(u.patch([{
+        op: 'move',
+        from: '',
+        path: ''
+    }], data)).toEqual(data);
+
+    expect(u.patch([{
+        op: 'move',
+        from: '/c',
+        path: '/a'
+    }], data)).toEqual({a: true});
+});
 
 
-test.todo('copy');
+test('copy', () => {
+    expect(u.patch([{
+        op: 'copy',
+        from: '',
+        path: ''
+    }], data)).toEqual(data);
+
+    expect(u.patch([{
+        op: 'copy',
+        from: '/c',
+        path: '/a'
+    }], data)).toEqual({a: true, c: true});
+});
 
 
-test.todo('test');
+test('test', () => {
+    u.patch([{
+        op: 'test',
+        path: '',
+        value: data
+    }], data);
+
+    u.patch([{
+        op: 'test',
+        path: '/a/3',
+        value: {b: 'abc'}
+    }], data);
+});
