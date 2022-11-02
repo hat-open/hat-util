@@ -127,7 +127,7 @@ function _add(path: JPatchPointer, val: JData, data: JData): JData {
             if (key == '-')
                 return [...data, val];
             const index = strictParseInt(key);
-            if (Number.isNaN(index) || index > data.length - 1 || index < 0)
+            if (Number.isNaN(index) || index > data.length || index < 0)
                 throw Error("invalid array index");
             return [
                 ..._islice(0, index, data),

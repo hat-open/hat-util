@@ -35,6 +35,12 @@ test('add', () => {
 
     expect(u.patch([{
         op: 'add',
+        path: '/a/2/0/0',
+        value: 42
+    }], data)).toEqual(u.set(['a', 2, 0, 0], 42, data));
+
+    expect(u.patch([{
+        op: 'add',
         path: '/a/2/0',
         value: 321
     }], data)).toEqual(u.set(['a', 2], [321, [], 123], data));
