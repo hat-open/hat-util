@@ -1,4 +1,6 @@
 export * from './curry';
+export * from './dragger';
+export * from './file';
 export * from './iter';
 export * from './json';
 export * from './misc';
