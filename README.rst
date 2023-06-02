@@ -1,42 +1,68 @@
+.. _online documentation: https://hat-util.hat-open.com
+.. _git repository: https://github.com/hat-open/hat-util.git
+.. _PyPI project: https://pypi.org/project/hat-util
+.. _npm package: https://www.npmjs.com/package/@hat-open/util
+.. _pydoit: https://pydoit.org
+.. _Hat Open: https://hat-open.com
+.. _Končar Digital: https://www.koncar.hr/en
+
+
 hat-util - Python, JavaScript and C utility library
 ===================================================
 
-This library is part of Hat Open project - open-source framework of tools and
-libraries for developing applications used for remote monitoring, control and
-management of intelligent electronic devices such as IoT devices, PLCs,
-industrial automation or home automation systems.
-
-Development of Hat Open and associated repositories is sponsored by
-`Končar Digital <https://www.koncar.hr>`_.
-
 For more information see:
 
-    * hat-util documentation - `<https://hat-util.hat-open.com>`_
-    * hat-util git repository - `<https://github.com/hat-open/hat-util.git>`_
-    * Hat Open homepage - `<https://hat-open.com>`_
-
-.. warning::
-
-    This project is currently in state of active development. Features,
-    functionality and API are unstable.
+* `online documentation`_
+* `git repository`_
 
 
 Install
 -------
 
-Python library::
+`hat-util` python library is available as `PyPI project`_::
 
     $ pip install hat-util
 
-JavaScript library::
+`hat-util` JavaScript library is available as `npm package`_::
 
     $ npm add @hat-open/util
+
+
+Build
+-----
+
+Build tool used for `hat-util` is `pydoit`_. It can be installed together
+with other python dependencies by running::
+
+    $ pip install -r requirements.pip.dev.txt
+
+For listing available doit tasks, use::
+
+    $ doit list
+
+Default task::
+
+    $ doit
+
+creates wheel package and npm package inside `build` directory.
+
+
+Hat Open
+--------
+
+`hat-util` is part of `Hat Open`_ project - open-source framework of tools
+and libraries for developing applications used for remote monitoring, control
+and management of intelligent electronic devices such as IoT devices, PLCs,
+industrial automation or home automation systems.
+
+Development of Hat Open and associated repositories is sponsored by
+`Končar Digital`_.
 
 
 License
 -------
 
-Copyright 2020-2022 Hat Open AUTHORS
+Copyright 2020-2023 Hat Open AUTHORS
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
