@@ -1,12 +1,19 @@
 """Common utility functions"""
 
+from typing import (Any,
+                    Callable,
+                    Iterable,
+                    NamedTuple,
+                    Type,
+                    TypeAlias,
+                    TypeVar)
 import contextlib
 import inspect
 import socket
-import typing
+import warnings
 
 
-T = typing.TypeVar('T')
+T = TypeVar('T')
 
 
 def register_type_alias(name: str):
@@ -19,17 +26,18 @@ def register_type_alias(name: str):
     and update annotations.
 
     """
+    warnings.warn("use typing.TypeAlias", DeprecationWarning)
     frame = inspect.stack()[1][0]
     f_locals = frame.f_locals
     t = f_locals[name]
-    f_locals[name] = typing.TypeVar(name, t, t)
-    f_locals.setdefault('__annotations__', {})[name] = typing.Type[t]
+    f_locals[name] = TypeVar(name, t, t)
+    f_locals.setdefault('__annotations__', {})[name] = Type[t]
 
 
-def first(xs: typing.Iterable[T],
-          fn: typing.Callable[[T], typing.Any] = lambda _: True,
-          default: typing.Optional[T] = None
-          ) -> typing.Optional[T]:
+def first(xs: Iterable[T],
+          fn: Callable[[T], Any] = lambda _: True,
+          default: T | None = None
+          ) -> T | None:
     """Return the first element from iterable that satisfies predicate `fn`,
     or `default` if no such element exists.
 
@@ -54,10 +62,10 @@ def first(xs: typing.Iterable[T],
     return next((i for i in xs if fn(i)), default)
 
 
-class RegisterCallbackHandle(typing.NamedTuple):
+class RegisterCallbackHandle(NamedTuple):
     """Handle for canceling callback registration."""
 
-    cancel: typing.Callable[[], None]
+    cancel: Callable[[], None]
     """cancel callback registration"""
 
     def __enter__(self):
@@ -67,7 +75,7 @@ class RegisterCallbackHandle(typing.NamedTuple):
         self.cancel()
 
 
-ExceptionCb = typing.Callable[[Exception], None]
+ExceptionCb: TypeAlias = Callable[[Exception], None]
 """Exception callback"""
 
 
@@ -100,12 +108,12 @@ class CallbackRegistry:
     """
 
     def __init__(self,
-                 exception_cb: typing.Optional[ExceptionCb] = None):
+                 exception_cb: ExceptionCb | None = None):
         self._exception_cb = exception_cb
-        self._cbs = []  # type: typing.List[typing.Callable]
+        self._cbs = []  # type: list[Callable]
 
     def register(self,
-                 cb: typing.Callable
+                 cb: Callable
                  ) -> RegisterCallbackHandle:
         """Register a callback."""
         self._cbs.append(cb)
@@ -135,7 +143,3 @@ def get_unused_udp_port(host: str = '127.0.0.1') -> int:
     with contextlib.closing(socket.socket(type=socket.SOCK_DGRAM)) as sock:
         sock.bind((host, 0))
         return sock.getsockname()[1]
-
-
-# HACK type alias
-register_type_alias('ExceptionCb')
