@@ -1,20 +1,14 @@
 """Common utility functions"""
 
-from typing import (Any,
-                    Callable,
-                    Iterable,
-                    NamedTuple,
-                    Type,
-                    TypeAlias,
-                    TypeVar)
 import collections
 import contextlib
 import inspect
 import socket
+import typing
 import warnings
 
 
-T = TypeVar('T')
+T = typing.TypeVar('T')
 
 
 def register_type_alias(name: str):
@@ -31,12 +25,12 @@ def register_type_alias(name: str):
     frame = inspect.stack()[1][0]
     f_locals = frame.f_locals
     t = f_locals[name]
-    f_locals[name] = TypeVar(name, t, t)
-    f_locals.setdefault('__annotations__', {})[name] = Type[t]
+    f_locals[name] = typing.TypeVar(name, t, t)
+    f_locals.setdefault('__annotations__', {})[name] = typing.Type[t]
 
 
-def first(xs: Iterable[T],
-          fn: Callable[[T], Any] = lambda _: True,
+def first(xs: typing.Iterable[T],
+          fn: typing.Callable[[T], typing.Any] = lambda _: True,
           default: T | None = None
           ) -> T | None:
     """Return the first element from iterable that satisfies predicate `fn`,
@@ -63,10 +57,10 @@ def first(xs: Iterable[T],
     return next((i for i in xs if fn(i)), default)
 
 
-class RegisterCallbackHandle(NamedTuple):
+class RegisterCallbackHandle(typing.NamedTuple):
     """Handle for canceling callback registration."""
 
-    cancel: Callable[[], None]
+    cancel: typing.Callable[[], None]
     """cancel callback registration"""
 
     def __enter__(self):
@@ -76,7 +70,7 @@ class RegisterCallbackHandle(NamedTuple):
         self.cancel()
 
 
-ExceptionCb: TypeAlias = Callable[[Exception], None]
+ExceptionCb: typing.TypeAlias = typing.Callable[[Exception], None]
 """Exception callback"""
 
 
@@ -114,7 +108,7 @@ class CallbackRegistry:
         self._cbs = []  # type: list[Callable]
 
     def register(self,
-                 cb: Callable
+                 cb: typing.Callable
                  ) -> RegisterCallbackHandle:
         """Register a callback."""
         self._cbs.append(cb)
@@ -146,7 +140,7 @@ def get_unused_udp_port(host: str = '127.0.0.1') -> int:
         return sock.getsockname()[1]
 
 
-Bytes: TypeAlias = bytes | bytearray | memoryview
+Bytes: typing.TypeAlias = bytes | bytearray | memoryview
 
 
 class BytesBuffer:
