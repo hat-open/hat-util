@@ -11,6 +11,9 @@ Homepage = "http://hat-open.com"
 Repository = "https://github.com/hat-open/hat-util.git"
 Documentation = "http://hat-util.hat-open.com"
 
+[optional-dependencies]
+dev = ["hat-doit ~=0.14.1"]
+
 [build-system]
 requires = ["hat-doit ~=0.14.1"]
 build-backend = "hat.doit.pep517"
