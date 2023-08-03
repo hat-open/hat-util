@@ -1,0 +1,31 @@
+[project]
+name = "hat-util"
+version = "0.6.10"
+description = "Hat utility library"
+readme = "README.rst"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+
+[project.urls]
+Homepage = "http://hat-open.com"
+Repository = "https://github.com/hat-open/hat-util.git"
+Documentation = "http://hat-util.hat-open.com"
+
+[build-system]
+requires = ["hat-doit ~=0.14.1"]
+build-backend = "hat.doit.pep517"
+
+[tool.hat-doit]
+build_wheel_task = "build_py"
+
+[tool.pytest.ini_options]
+testpaths = ["test_pytest"]
+asyncio_mode = "auto"
+timeout = 300
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.run]
+include = ["src_py/*"]
+data_file = "build/.coverage"

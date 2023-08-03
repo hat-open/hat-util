@@ -6,11 +6,11 @@ from hat.doit import common
 from hat.doit.c import get_task_clang_format
 from hat.doit.docs import (build_sphinx,
                            build_pdoc)
-from hat.doit.js import (build_npm,
+from hat.doit.js import (get_task_build_npm,
                          ESLintConf,
                          run_eslint)
-from hat.doit.py import (build_wheel,
-                         run_pytest,
+from hat.doit.py import (get_task_build_wheel,
+                         get_task_run_pytest,
                          run_flake8)
 
 
@@ -61,35 +61,17 @@ def task_build():
 
 def task_build_py():
     """Build Python wheel"""
-
-    def build():
-        build_wheel(
-            src_dir=src_py_dir,
-            dst_dir=build_py_dir,
-            name='hat-util',
-            description='Hat utility library',
-            url='https://github.com/hat-open/hat-util',
-            license=common.License.APACHE2)
-
-    return {'actions': [build]}
+    return get_task_build_wheel(src_dir=src_py_dir,
+                                build_dir=build_py_dir,)
 
 
 def task_build_js():
     """Build JavaScript npm"""
-
-    def build():
-        build_npm(
-            src_dir=build_ts_dir,
-            dst_dir=build_js_dir,
-            name='@hat-open/util',
-            description='Hat utility module',
-            license=common.License.APACHE2,
-            homepage='https://github.com/hat-open/hat-util',
-            repository='hat-open/hat-util')
-
-    return {'actions': [build],
-            'task_dep': ['build_ts',
-                         'node_modules']}
+    return get_task_build_npm(src_dir=build_ts_dir,
+                              build_dir=build_js_dir,
+                              name='@hat-open/util',
+                              task_dep=['build_ts',
+                                        'node_modules'])
 
 
 def task_build_ts():
@@ -112,8 +94,7 @@ def task_test():
 
 def task_test_pytest():
     """Test pytest"""
-    return {'actions': [lambda args: run_pytest(pytest_dir, *(args or []))],
-            'pos_arg': 'args'}
+    return get_task_run_pytest()
 
 
 def task_test_jest():

@@ -10,6 +10,8 @@ import warnings
 
 T = typing.TypeVar('T')
 
+Bytes: typing.TypeAlias = bytes | bytearray | memoryview
+
 
 def register_type_alias(name: str):
     """Register type alias
@@ -138,9 +140,6 @@ def get_unused_udp_port(host: str = '127.0.0.1') -> int:
     with contextlib.closing(socket.socket(type=socket.SOCK_DGRAM)) as sock:
         sock.bind((host, 0))
         return sock.getsockname()[1]
-
-
-Bytes: typing.TypeAlias = bytes | bytearray | memoryview
 
 
 class BytesBuffer:
