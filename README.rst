@@ -33,7 +33,7 @@ Build
 
 To install python dependencies and editable development installation, run::
 
-    $ pip install -e .[dev]
+    $ pip install -e '.[dev]'
 
 Build tool used for `hat-util` is `pydoit`_ (installed with other python
 dependencies). For listing available doit tasks, use::

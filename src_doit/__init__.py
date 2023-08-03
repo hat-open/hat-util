@@ -62,7 +62,7 @@ def task_build():
 def task_build_py():
     """Build Python wheel"""
     return get_task_build_wheel(src_dir=src_py_dir,
-                                build_dir=build_py_dir,)
+                                build_dir=build_py_dir)
 
 
 def task_build_js():
