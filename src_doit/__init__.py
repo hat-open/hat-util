@@ -11,6 +11,7 @@ from hat.doit.js import (get_task_build_npm,
                          run_eslint)
 from hat.doit.py import (get_task_build_wheel,
                          get_task_run_pytest,
+                         get_task_run_pip_compile,
                          run_flake8)
 
 
@@ -25,6 +26,7 @@ __all__ = ['task_clean_all',
            'task_test_jest',
            'task_check',
            'task_format',
+           'task_pip_compile',
            'task_docs']
 
 
@@ -122,6 +124,11 @@ def task_format():
     """Format"""
     yield from get_task_clang_format([*Path('src_c/hat').rglob('*.c'),
                                       *Path('src_c/hat').rglob('*.h')])
+
+
+def task_pip_compile():
+    """Run pip-compile"""
+    return get_task_run_pip_compile()
 
 
 def task_docs():
