@@ -1,7 +1,7 @@
-import { curry } from './curry';
-import { _islice } from './iter';
-import { JData } from './json';
-import { isArray, isObject, strictParseInt, equals } from './misc';
+import { curry } from './curry.js';
+import { _islice } from './iter.js';
+import { JData } from './json.js';
+import { isArray, isObject, strictParseInt, equals } from './misc.js';
 
 
 export type JPatchOpAdd = {

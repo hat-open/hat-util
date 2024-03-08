@@ -1,5 +1,5 @@
-import { curry } from './curry';
-import { isNumber, isString, isArray, isObject, flatten, repeat } from './misc';
+import { curry } from './curry.js';
+import { isNumber, isString, isArray, isObject, flatten, repeat } from './misc.js';
 
 
 export type JArray = JData[];

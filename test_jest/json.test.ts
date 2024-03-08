@@ -1,13 +1,12 @@
 import { expect, test } from '@jest/globals';
 
-import * as u from '../src_js/index';
+import * as u from '../src_js/index.js';
 
 
 const data: u.JData = {
     a: [1, 2, [[], 123], {b: 'abc'}],
     c: true
 };
-
 
 test('get', () => {
     expect(u.get).toBeInstanceOf(Function);

@@ -1,4 +1,4 @@
-import { curry, Curried1, Curried2, Curried3 } from './curry';
+import { curry, Curried1, Curried2, Curried3 } from './curry.js';
 
 
 /**

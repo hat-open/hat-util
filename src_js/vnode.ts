@@ -1,6 +1,6 @@
-import { curry } from './curry';
-import { _get, _change, _omit } from './json';
-import { isString, isArray, isObject, isNil } from './misc';
+import { curry } from './curry.js';
+import { _get, _change, _omit } from './json.js';
+import { isString, isArray, isObject, isNil } from './misc.js';
 
 
 export type VNode = VNodeWithoutData | VNodeWithData;

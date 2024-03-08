@@ -51,7 +51,7 @@ def task_clean_all():
 
 def task_node_modules():
     """Install node_modules"""
-    return {'actions': ['yarn install --silent']}
+    return {'actions': ['npm install --silent --progress false']}
 
 
 def task_build():
@@ -80,7 +80,7 @@ def task_build_ts():
     """Build TypeScript"""
 
     def build():
-        subprocess.run(['node_modules/.bin/tsc'],
+        subprocess.run(['npx', 'tsc'],
                        check=True)
 
     return {'actions': [build],
@@ -103,7 +103,7 @@ def task_test_jest():
     """Test jest"""
 
     def run(args):
-        subprocess.run(['node_modules/.bin/jest', *(args or [])],
+        subprocess.run(['npx', 'jest', *(args or [])],
                        check=True)
 
     return {'actions': [run],
@@ -140,7 +140,7 @@ def task_docs():
                      project='hat-util')
         build_pdoc(module='hat.util',
                    dst_dir=build_docs_dir / 'py_api')
-        subprocess.run(['node_modules/.bin/typedoc',
+        subprocess.run(['npx', 'typedoc',
                         '--logLevel', 'Warn',
                         '--name', '@hat-open/util',
                         '--out', str(build_docs_dir / 'js_api'),

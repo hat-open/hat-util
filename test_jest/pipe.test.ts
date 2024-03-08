@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals';
 
-import * as u from '../src_js/index';
+import * as u from '../src_js/index.js';
 
 
 test('pipe', () => {
