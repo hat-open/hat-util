@@ -25,7 +25,7 @@ Install
 
 `hat-util` JavaScript library is available as `npm package`_::
 
-    $ npm add @hat-open/util
+    $ npm install @hat-open/util
 
 
 Build
