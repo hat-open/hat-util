@@ -1,6 +1,8 @@
 import './mock.js';
 
 import * as u from '../../build/js/index.js';
+import jsonpatch from 'fast-json-patch';
+import jiff from 'jiff';
 
 
 const data = {};
@@ -14,6 +16,16 @@ for (let i = 0; i < 10000; ++i) {
     }
 }
 
-console.time('patch');
-const result = u.patch(patch, data);
-console.timeEnd('patch');
+for (let i = 0; i < 3; ++i) {
+    console.time('u.patch');
+    u.patch(patch, data);
+    console.timeEnd('u.patch');
+
+    console.time('fast-json-patch');
+    jsonpatch.applyPatch(data, patch, false, false).newDocument;
+    console.timeEnd('fast-json-patch');
+
+    console.time('jiff');
+    jiff.patch(patch, data);
+    console.timeEnd('jiff');
+}
