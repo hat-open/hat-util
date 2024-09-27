@@ -18,7 +18,7 @@
 #include <string.h>
 
 #define HAT_BUFF_SUCCESS 0
-#define HAT_BUFF_ERROR 1
+#define HAT_BUFF_ERROR (-1)
 
 #ifdef __cplusplus
 extern "C" {

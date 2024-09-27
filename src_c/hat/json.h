@@ -11,7 +11,7 @@
 #endif
 
 #define HAT_JSON_SUCCESS 0
-#define HAT_JSON_ERROR 1
+#define HAT_JSON_ERROR (-1)
 
 #define HAT_JSON_TOKEN_NULL 0
 #define HAT_JSON_TOKEN_BOOL 1

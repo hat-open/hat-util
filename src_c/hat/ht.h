@@ -13,7 +13,7 @@
 #include "allocator.h"
 
 #define HAT_HT_SUCCESS 0
-#define HAT_HT_ERROR 1
+#define HAT_HT_ERROR (-1)
 
 #ifdef __cplusplus
 extern "C" {

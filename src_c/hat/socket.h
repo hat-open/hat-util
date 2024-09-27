@@ -18,7 +18,7 @@
 #include "buff.h"
 
 #define HAT_SOCKET_SUCCESS 0
-#define HAT_SOCKET_ERROR 1
+#define HAT_SOCKET_ERROR (-1)
 
 #define HAT_SOCKET_TYPE_IP4_TCP 0
 #define HAT_SOCKET_TYPE_IP4_UDP 1
