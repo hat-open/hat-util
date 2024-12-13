@@ -161,9 +161,7 @@ export function _omitVNode(
 export const omitVNode = curry(_omitVNode);
 
 
-function testSelector(selector: string, node: VNode): boolean {
-    selector as any;
-    node as any;
+function testSelector(selector: string, node: VNode): boolean {  // eslint-disable-line
 
     // TODO
 
