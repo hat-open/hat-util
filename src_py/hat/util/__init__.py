@@ -9,7 +9,8 @@ from hat.util.callback import (RegisterCallbackHandle,
 from hat.util.first import first
 from hat.util.socket import (get_unused_tcp_port,
                              get_unused_udp_port)
-from hat.util.sqlite3 import register_sqlite3_timestamp_converter
+from hat.util.sqlite3 import (sqlite3_adapt_datetime,
+                              sqlite3_convert_timestamp)
 
 
 __all__ = ['cron',
@@ -21,4 +22,5 @@ __all__ = ['cron',
            'first',
            'get_unused_tcp_port',
            'get_unused_udp_port',
-           'register_sqlite3_timestamp_converter']
+           'sqlite3_adapt_datetime',
+           'sqlite3_convert_timestamp']

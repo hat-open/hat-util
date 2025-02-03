@@ -8,7 +8,8 @@ from hat import util
 
 @pytest.fixture(scope='session', autouse=True)
 def register_sqlite3_timestamp_converter():
-    util.register_sqlite3_timestamp_converter()
+    sqlite3.register_adapter(datetime.datetime, util.sqlite3_adapt_datetime)
+    sqlite3.register_converter("timestamp", util.sqlite3_convert_timestamp)
 
 
 @pytest.mark.parametrize("t", [
