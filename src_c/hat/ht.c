@@ -138,7 +138,7 @@ int hat_ht_set(hat_ht_t *t, void *key, size_t key_size, void *value) {
     *slot = el;
     t->count += 1;
 
-    resize(t);  // TODO check resize error
+    resize(t); // TODO check resize error
 
     return HAT_HT_SUCCESS;
 }
@@ -172,7 +172,7 @@ void *hat_ht_pop(hat_ht_t *t, void *key, size_t key_size) {
             *slot = el->next;
             hat_allocator_free(t->a, el);
             t->count -= 1;
-            resize(t);  // TODO check resize error
+            resize(t); // TODO check resize error
             return value;
         }
         slot = &((*slot)->next);
@@ -193,7 +193,7 @@ int hat_ht_del(hat_ht_t *t, void *key, size_t key_size) {
             *slot = el->next;
             hat_allocator_free(t->a, el);
             t->count -= 1;
-            resize(t);  // TODO check resize error
+            resize(t); // TODO check resize error
             return HAT_HT_SUCCESS;
         }
         slot = &((*slot)->next);
