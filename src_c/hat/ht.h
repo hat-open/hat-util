@@ -31,31 +31,18 @@ typedef void *hat_ht_iter_t;
     \param[in] avg_count estimated number of elements in table
     \return table or ``NULL`` on failure
  */
-hat_ht_t *hat_ht_create(hat_allocator_t *a, size_t avg_count);
+hat_ht_t *hat_ht_create(hat_allocator_t *a);
 
 /*! \brief Destroy hash table
     \param[in] t table
  */
 void hat_ht_destroy(hat_ht_t *t);
 
-/*! \brief Reallocate hash table based on new average count
-    \param[in] t table
-    \param[in] avg_count new estimated number of elements in table
-    \return ``HAT_HT_SUCCESS`` or ``HAT_HT_ERROR``
- */
-int hat_ht_resize(hat_ht_t *t, size_t avg_count);
-
 /*! \brief Number of elements in table
     \param[in] t table
     \return elements count
  */
 size_t hat_ht_count(hat_ht_t *t);
-
-/*! \brief Initially estimated number of elements in table
-    \param[in] t table
-    \return elements count
- */
-size_t hat_ht_avg_count(hat_ht_t *t);
 
 /*! \brief Set element in table
     \param[in] t table

@@ -33,14 +33,49 @@ static size_t hash_function(uint8_t *key, size_t key_size) {
 }
 
 
-hat_ht_t *hat_ht_create(hat_allocator_t *a, size_t avg_count) {
+static int resize(hat_ht_t *t) {
+    if (t->count * 2 < 8)
+        return HAT_HT_SUCCESS;
+
+    size_t avg_count = (t->cap - 1) * 8 / 10;
+    if (t->count < avg_count && t->count > avg_count / 4)
+        return HAT_HT_SUCCESS;
+
+    size_t new_cap = t->count * 2 * 10 / 8 + 1;
+
+    element_t **new_slots =
+        hat_allocator_alloc(t->a, new_cap * sizeof(element_t *));
+    if (!new_slots)
+        return HAT_HT_ERROR;
+
+    memset(new_slots, 0, new_cap * sizeof(element_t *));
+
+    for (size_t i = 0; i < t->cap; ++i) {
+        element_t *el = t->slots[i];
+        while (el) {
+            element_t *next = el->next;
+            el->next = new_slots[el->hash % new_cap];
+            new_slots[el->hash % new_cap] = el;
+            el = next;
+        }
+    }
+
+    hat_allocator_free(t->a, t->slots);
+
+    t->cap = new_cap;
+    t->slots = new_slots;
+    return HAT_HT_SUCCESS;
+}
+
+
+hat_ht_t *hat_ht_create(hat_allocator_t *a) {
     hat_ht_t *t = hat_allocator_alloc(a, sizeof(hat_ht_t));
     if (!t)
         return NULL;
 
     t->a = a;
     t->count = 0;
-    t->cap = avg_count * 10 / 8 + 1;
+    t->cap = 8 * 10 / 8 + 1;
 
     t->slots = hat_allocator_alloc(a, t->cap * sizeof(element_t *));
     if (!t->slots) {
@@ -68,40 +103,7 @@ void hat_ht_destroy(hat_ht_t *t) {
 }
 
 
-int hat_ht_resize(hat_ht_t *t, size_t avg_count) {
-    size_t new_cap = avg_count * 10 / 8 + 1;
-    if (new_cap == t->cap)
-        return HAT_HT_SUCCESS;
-
-    element_t **new_slots =
-        hat_allocator_alloc(t->a, new_cap * sizeof(element_t *));
-    if (!new_slots)
-        return HAT_HT_ERROR;
-
-    memset(new_slots, 0, new_cap * sizeof(element_t *));
-
-    for (size_t i = 0; i < t->cap; ++i) {
-        element_t *el = t->slots[i];
-        while (el) {
-            element_t *next = el->next;
-            el->next = new_slots[el->hash % new_cap];
-            new_slots[el->hash % new_cap] = el;
-            el = next;
-        }
-    }
-
-    hat_allocator_free(t->a, t->slots);
-
-    t->cap = new_cap;
-    t->slots = new_slots;
-    return HAT_HT_SUCCESS;
-}
-
-
 size_t hat_ht_count(hat_ht_t *t) { return t->count; }
-
-
-size_t hat_ht_avg_count(hat_ht_t *t) { return (t->cap - 1) * 8 / 10; }
 
 
 int hat_ht_set(hat_ht_t *t, void *key, size_t key_size, void *value) {
@@ -118,21 +120,26 @@ int hat_ht_set(hat_ht_t *t, void *key, size_t key_size, void *value) {
         slot = &((*slot)->next);
     }
 
-    if (!el) {
-        el = hat_allocator_alloc(t->a, sizeof(element_t) + key_size);
-        if (!el)
-            return HAT_HT_ERROR;
-
-        el->next = NULL;
-        el->hash = hash;
-        el->key_size = key_size;
-        memcpy(el->key, key, key_size);
-
-        *slot = el;
-        t->count += 1;
+    if (el) {
+        el->value = value;
+        return HAT_HT_SUCCESS;
     }
 
+    el = hat_allocator_alloc(t->a, sizeof(element_t) + key_size);
+    if (!el)
+        return HAT_HT_ERROR;
+
+    el->next = NULL;
+    el->hash = hash;
+    el->key_size = key_size;
     el->value = value;
+    memcpy(el->key, key, key_size);
+
+    *slot = el;
+    t->count += 1;
+
+    resize(t);  // TODO check resize error
+
     return HAT_HT_SUCCESS;
 }
 
@@ -165,6 +172,7 @@ void *hat_ht_pop(hat_ht_t *t, void *key, size_t key_size) {
             *slot = el->next;
             hat_allocator_free(t->a, el);
             t->count -= 1;
+            resize(t);  // TODO check resize error
             return value;
         }
         slot = &((*slot)->next);
@@ -185,6 +193,7 @@ int hat_ht_del(hat_ht_t *t, void *key, size_t key_size) {
             *slot = el->next;
             hat_allocator_free(t->a, el);
             t->count -= 1;
+            resize(t);  // TODO check resize error
             return HAT_HT_SUCCESS;
         }
         slot = &((*slot)->next);
