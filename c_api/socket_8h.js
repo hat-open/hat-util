@@ -1,0 +1,25 @@
+var socket_8h =
+[
+    [ "hat_socket_t", "structhat__socket__t.html", "structhat__socket__t" ],
+    [ "HAT_SOCKET_ERROR", "socket_8h.html#ac4ed333666e979aa4fc142bf6b4309c9", null ],
+    [ "HAT_SOCKET_SUCCESS", "socket_8h.html#ad8893da467ea3c84505cbd3215bbca39", null ],
+    [ "HAT_SOCKET_TYPE_IP4_TCP", "socket_8h.html#a61df869cf2bd6715766cebd59e650e59", null ],
+    [ "HAT_SOCKET_TYPE_IP4_UDP", "socket_8h.html#a4bbd19b71f89c23154da6ec51c77d4b2", null ],
+    [ "hat_socket_ip4_addr_t", "socket_8h.html#a4788bc2c2b2096c24f50a2d25046e0f7", null ],
+    [ "hat_socket_port_t", "socket_8h.html#a21d0236e8cfd45a6aba4ace3cb4a771b", null ],
+    [ "hat_socket_accept", "socket_8h.html#a81d991c679b668fab7000563cc0fccb0", null ],
+    [ "hat_socket_addr_convert", "socket_8h.html#a44914dec8114d951efc1b9d4fa46a429", null ],
+    [ "hat_socket_addr_resolve", "socket_8h.html#a705092f67c0a22d968503e8132d0ff58", null ],
+    [ "hat_socket_bind", "socket_8h.html#a2a3cd0dd35dd2c0ea8f624f0935ff435", null ],
+    [ "hat_socket_cleanup", "socket_8h.html#aaca207d14b6b2a0299eac6daba89e96b", null ],
+    [ "hat_socket_close", "socket_8h.html#ab44c3161663c85172d1cff017782fbb3", null ],
+    [ "hat_socket_connect", "socket_8h.html#a521f1d78edb1ce9e3231993fb4639381", null ],
+    [ "hat_socket_listen", "socket_8h.html#a170756d879592f4379f048a3eb359826", null ],
+    [ "hat_socket_open", "socket_8h.html#a3624d5a5cdb5cca7010fe9aace47b4cd", null ],
+    [ "hat_socket_receive", "socket_8h.html#a2d0ef705fcef77dd8b80cd93abf4367a", null ],
+    [ "hat_socket_receive_from", "socket_8h.html#a851b236171429a953b83f5137819fe8e", null ],
+    [ "hat_socket_send", "socket_8h.html#a654075082302cac15d8d8d92f8729973", null ],
+    [ "hat_socket_send_to", "socket_8h.html#a22c5fe4f2c3c211c742dbfe279e5c785", null ],
+    [ "hat_socket_set_blocking", "socket_8h.html#aeed9365c02d6dc66f233c7e4071adfea", null ],
+    [ "hat_socket_setup", "socket_8h.html#a2650b0bdb20b69f2da8dd26e53cd0c8e", null ]
+];
