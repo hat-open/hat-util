@@ -46,6 +46,6 @@ def sqlite3_convert_timestamp(val: bytes) -> datetime.datetime:
     else:
         tz = None
 
-    val = datetime.datetime(year, month, day, hours, minutes, seconds,
-                            microseconds, tz)
-    return val
+    dt = datetime.datetime(year, month, day, hours, minutes, seconds,
+                           microseconds, tz)
+    return dt
