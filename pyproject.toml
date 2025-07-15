@@ -1,6 +1,6 @@
 [project]
 name = "hat-util"
-version = "0.6.19"
+version = "0.6.20"
 description = "Hat utility library"
 readme = "README.rst"
 requires-python = ">=3.10"

@@ -1,3 +1,4 @@
+from collections.abc import Collection
 import datetime
 import typing
 
@@ -11,12 +12,12 @@ class ValueSubExpr(typing.NamedTuple):
 
 
 class RangeSubExpr(typing.NamedTuple):
-    from_: ValueSubExpr
-    to: ValueSubExpr
+    from_: int
+    to: int
 
 
 class ListSubExpr(typing.NamedTuple):
-    subexprs: list[ValueSubExpr]
+    subexprs: Collection[ValueSubExpr | RangeSubExpr]
 
 
 SubExpr: typing.TypeAlias = (AllSubExpr |
@@ -34,7 +35,16 @@ class Expr(typing.NamedTuple):
 
 
 def parse(expr_str: str) -> Expr:
-    return Expr(*(_parse_subexpr(i) for i in expr_str.split(' ')))
+    subexpr_strs = expr_str.split()
+    if len(subexpr_strs) != 5:
+        raise ValueError('invalid number of subexpressions')
+
+    return Expr(
+        minute=_parse_subexpr(subexpr_strs[0], _parse_minute),
+        hour=_parse_subexpr(subexpr_strs[1], _parse_hour),
+        day=_parse_subexpr(subexpr_strs[2], _parse_day),
+        month=_parse_subexpr(subexpr_strs[3], _parse_month),
+        day_of_week=_parse_subexpr(subexpr_strs[4], _parse_day_of_week))
 
 
 def next(expr: Expr,
@@ -73,18 +83,19 @@ def match(expr: Expr,
     return True
 
 
-def _parse_subexpr(subexpr_str):
+def _parse_subexpr(subexpr_str, value_parser):
     if subexpr_str == '*':
         return AllSubExpr()
 
+    if ',' in subexpr_str:
+        return ListSubExpr([_parse_subexpr(i, value_parser)
+                            for i in subexpr_str.split(',')])
+
     if '-' in subexpr_str:
         from_str, to_str = subexpr_str.split('-')
-        return RangeSubExpr(int(from_str), int(to_str))
+        return RangeSubExpr(value_parser(from_str), value_parser(to_str))
 
-    if ',' in subexpr_str:
-        return ListSubExpr([int(i) for i in subexpr_str.split(',')])
-
-    return ValueSubExpr(int(subexpr_str))
+    return ValueSubExpr(value_parser(subexpr_str))
 
 
 def _match_subexpr(subexpr, value):
@@ -98,6 +109,46 @@ def _match_subexpr(subexpr, value):
         return subexpr.from_ <= value <= subexpr.to
 
     if isinstance(subexpr, ListSubExpr):
-        return value in subexpr.subexprs
+        return any(_match_subexpr(i, value) for i in subexpr.subexprs)
 
     raise ValueError('unsupported subexpression')
+
+
+def _parse_minute(value_str):
+    value = int(value_str)
+    if not (0 <= value <= 59):
+        raise ValueError('invalid minute value')
+
+    return value
+
+
+def _parse_hour(value_str):
+    value = int(value_str)
+    if not (0 <= value <= 23):
+        raise ValueError('invalid hour value')
+
+    return value
+
+
+def _parse_day(value_str):
+    value = int(value_str)
+    if not (1 <= value <= 31):
+        raise ValueError('invalid day value')
+
+    return value
+
+
+def _parse_month(value_str):
+    value = int(value_str)
+    if not (1 <= value <= 12):
+        raise ValueError('invalid month value')
+
+    return value
+
+
+def _parse_day_of_week(value_str):
+    value = int(value_str)
+    if not (0 <= value <= 6):
+        raise ValueError('invalid day of week value')
+
+    return value
