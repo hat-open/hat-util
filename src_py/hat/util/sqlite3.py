@@ -1,7 +1,7 @@
 import datetime
 
 
-def sqlite3_adapt_datetime(val: datetime.datetime):
+def sqlite3_adapt_datetime(val: datetime.datetime) -> str:
     """SQLite3 datetime adapter
 
     Adapter usage::

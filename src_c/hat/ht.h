@@ -28,7 +28,6 @@ typedef void *hat_ht_iter_t;
 
 /*! \brief Create new hash table
     \param[in] a allocator
-    \param[in] avg_count estimated number of elements in table
     \return table or ``NULL`` on failure
  */
 hat_ht_t *hat_ht_create(hat_allocator_t *a);
