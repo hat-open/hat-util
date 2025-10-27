@@ -9,6 +9,56 @@ const data: u.JData = {
 };
 
 
+test('diff', () => {
+    expect(u.diff(data, data)).toEqual([]);
+
+    expect(u.diff(null, data)).toEqual([{
+        op: 'replace',
+        path: '',
+        value: data
+    }]);
+
+    expect(u.diff(data, u.set('c', false, data))).toEqual([{
+        op: 'replace',
+        path: '/c',
+        value: false
+    }]);
+
+    expect(u.diff(data, u.omit('c', data))).toEqual([{
+        op: 'remove',
+        path: '/c',
+    }]);
+
+    expect(u.diff(data, u.set('d', 123, data))).toEqual([{
+        op: 'add',
+        path: '/d',
+        value: 123
+    }]);
+
+    expect(u.diff(data, u.set(['a', 1], 5, data))).toEqual([{
+        op: 'replace',
+        path: '/a/1',
+        value: 5
+    }]);
+
+    expect(u.diff(data, u.change('a', (i: any) => ['def', ...i], data))).toEqual([{
+        op: 'add',
+        path: '/a/0',
+        value: 'def'
+    }]);
+
+    expect(u.diff(data, u.omit(['a', 0], data))).toEqual([{
+        op: 'remove',
+        path: '/a/0',
+    }]);
+
+    expect(u.diff(data, u.omit(['a', 0], data))).toEqual([{
+        op: 'remove',
+        path: '/a/0',
+    }]);
+});
+
+
 test('empty', () => {
     expect(u.patch([], data)).toEqual(data);
 });
