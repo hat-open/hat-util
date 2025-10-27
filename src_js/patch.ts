@@ -46,6 +46,111 @@ export type JPatch = JPatchOp[];
 
 type JPatchPointer = string[];
 
+export const diff = curry((
+    oldData: JData,
+    newData: JData
+): JPatch => {
+    return Array.from(_diff([], oldData, newData));
+});
+
+function* _diff(pointer: JPatchPointer, oldData: JData, newData: JData): Generator<JPatchOp, void, void> {
+
+    if (oldData === newData)
+        return;
+
+    if (isArray(oldData) && isArray(newData)) {
+        if (oldData.length == 0 && newData.length == 0)
+            return;
+
+        if (oldData.length == 0 || newData.length == 0) {
+            yield { op: 'replace', path: stringifyPointer(pointer), value: newData };
+            return;
+        }
+
+        if (oldData.length == newData.length) {
+            for (let i = 0; i < oldData.length; i++) {
+                yield *_diff([...pointer, String(i)], oldData[i], newData[i]);
+            }
+            return;
+        }
+
+        if (oldData.length > newData.length) {
+            let newIdx = 0;
+            let toRemove = oldData.length - newData.length;
+
+            for (let oldIdx = 0; oldIdx < oldData.length; oldIdx++) {
+                if (newIdx < newData.length && oldData[oldIdx] === newData[newIdx]) {
+                    newIdx++;
+                } else if (toRemove > 0) {
+                    yield {
+                        op: 'remove',
+                        path: stringifyPointer([...pointer, String(newIdx)])
+                    };
+                    toRemove--;
+                } else {
+                    yield* _diff([...pointer, String(newIdx)], oldData[oldIdx], newData[newIdx]);
+                    newIdx++;
+                }
+            }
+
+            return;
+        }
+
+        if (oldData.length < newData.length) {
+            let oldIdx = 0;
+            let toAdd = newData.length - oldData.length;
+
+            for (let newIdx = 0; newIdx < newData.length; newIdx++) {
+                if (oldIdx < oldData.length && oldData[oldIdx] === newData[newIdx]) {
+                    oldIdx++;
+                } else if (toAdd > 0) {
+                    yield {
+                        op: 'add',
+                        path: stringifyPointer([...pointer, String(newIdx)]),
+                        value: newData[newIdx]
+                    };
+                    toAdd--;
+                } else {
+                    yield* _diff([...pointer, String(newIdx)], oldData[oldIdx], newData[newIdx]);
+                    oldIdx++;
+                }
+            }
+
+            return;
+        }
+
+        return;
+    }
+
+    if (isObject(oldData) && isObject(newData)) {
+        const oldKeys = Object.keys(oldData);
+        const newKeys = Object.keys(newData);
+
+        if (oldKeys.length == 0 && newKeys.length == 0)
+            return;
+
+        if (oldKeys.length == 0 || newKeys.length == 0) {
+            yield { op: 'replace', path: stringifyPointer(pointer), value: newData };
+            return;
+        }
+
+        for (const key of oldKeys) {
+            if (!Object.hasOwn(newData, key))
+                yield { op: 'remove', path: stringifyPointer([...pointer, key]) };
+        }
+
+        for (const key of newKeys) {
+            if (!Object.hasOwn(oldData, key))
+                yield { op: 'add', path: stringifyPointer([...pointer, key]), value: newData[key] };
+            else
+                yield* _diff([...pointer, key], oldData[key], newData[key]);
+        }
+
+        return;
+    }
+
+    yield { op: 'replace', path: stringifyPointer(pointer), value: newData };
+}
 
 export const patch = curry((
     diff: JPatch,
@@ -108,8 +213,19 @@ const operations = {
     test: opTest
 };
 
+function escapePointerSegment(segment: string): string {
+    return segment.replaceAll('~', '~0').replaceAll('/', '~1');
+}
+
 function unescapePointerSegment(segment: string): string {
     return segment.replaceAll('~1', '/').replaceAll('~0', '~');
+}
+
+function stringifyPointer(pointer: JPatchPointer): string {
+    if (pointer.length == 0)
+        return '';
+
+    return '/' + pointer.map(escapePointerSegment).join('/');
 }
 
 function parsePointer(pointer: string): JPatchPointer {
