@@ -16,10 +16,15 @@ Repository = "https://github.com/hat-open/hat-util.git"
 Documentation = "http://hat-util.hat-open.com"
 
 [dependency-groups]
-dev = ["hat-doit ~=0.16.3"]
+run = []
+build = ["hat-doit ~=0.16.4"]
+dev = [
+    {include-group = "run"},
+    {include-group = "build"},
+]
 
 [build-system]
-requires = ["hat-doit ~=0.16.3"]
+requires = ["hat-doit ~=0.16.4"]
 build-backend = "hat.doit.pep517"
 
 [tool.hat-doit]

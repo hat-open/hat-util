@@ -34,11 +34,7 @@ Build
 To install editable installation, together with python development
 dependencies, run::
 
-    $ pip install --group dev -e '.'
-
-To install only python development dependencies, run::
-
-    $ pip install -r requirements.pip.txt
+    $ pip install --group dev -e .
 
 Build tool used for `hat-util` is `pydoit`_. For listing available doit tasks,
 use::
