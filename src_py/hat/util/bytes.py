@@ -34,50 +34,50 @@ class BytesBuffer:
         If ``n < 0``, read all data.
 
         """
-        if n == 0:
+        if n == 0 or self._data_len < 1:
             return b''
 
         if n < 0 or n >= self._data_len:
             data, self._data = self._data, collections.deque()
             data_len, self._data_len = self._data_len, 0
 
-        else:
-            data = collections.deque()
-            data_len = 0
+            if len(data) < 2:
+                return data[0]
 
-            while data_len < n:
-                head = self._data.popleft()
-                self._data_len -= len(head)
+            return b''.join(data)
 
-                if data_len + len(head) <= n:
-                    data.append(head)
-                    data_len += len(head)
+        self._data_len -= n
 
-                else:
+        head = self._data[0]
+        head_len = len(head)
+
+        if n < head_len:
+            if not isinstance(head, memoryview):
+                head = memoryview(head)
+
+            self._data[0] = head[n:]
+            return head[:n]
+
+        if n == head_len:
+            return self._data.popleft()
+
+        data = collections.deque()
+        data_len = 0
+
+        while data_len < n:
+            head = self._data.popleft()
+
+            if data_len + len(head) > n:
+                if not isinstance(head, memoryview):
                     head = memoryview(head)
-                    head1, head2 = head[:n-data_len], head[n-data_len:]
 
-                    data.append(head1)
-                    data_len += len(head1)
+                head, rest = head[:n-data_len], head[n-data_len:]
+                self._data.appendleft(rest)
 
-                    self._data.appendleft(head2)
-                    self._data_len += len(head2)
+            data.append(head)
+            data_len += len(head)
 
-        if len(data) < 1:
-            return b''
-
-        if len(data) < 2:
-            return data[0]
-
-        data_bytes = bytearray(data_len)
-        data_bytes_len = 0
-
-        while data:
-            head = data.popleft()
-            data_bytes[data_bytes_len:data_bytes_len+len(head)] = head
-            data_bytes_len += len(head)
-
-        return data_bytes
+        return b''.join(data)
 
     def clear(self) -> int:
         """Clear data and return number of bytes cleared"""
