@@ -1,13 +1,12 @@
 [project]
 name = "hat-util"
-version = "0.6.23"
+version = "0.6.24"
 description = "Hat utility library"
 readme = "README.rst"
 requires-python = ">=3.10"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License"
+    "Programming Language :: Python :: 3"
 ]
 
 [project.urls]
@@ -17,14 +16,14 @@ Documentation = "http://hat-util.hat-open.com"
 
 [dependency-groups]
 run = []
-build = ["hat-doit ~=0.16.4"]
+build = ["hat-doit ~=0.17.0"]
 dev = [
     {include-group = "run"},
     {include-group = "build"},
 ]
 
 [build-system]
-requires = ["hat-doit ~=0.16.4"]
+requires = ["hat-doit ~=0.17.0"]
 build-backend = "hat.doit.pep517"
 
 [tool.hat-doit]
