@@ -1,4 +1,5 @@
 from collections.abc import Callable
+import collections
 import typing
 
 
@@ -50,22 +51,30 @@ class CallbackRegistry:
     def __init__(self,
                  exception_cb: ExceptionCb | None = None):
         self._exception_cb = exception_cb
-        self._cbs = []  # type: list[Callable]
+        self._cbs = collections.deque()
 
     def register(self,
                  cb: Callable
                  ) -> RegisterCallbackHandle:
         """Register a callback."""
+        self._cbs = self._cbs.copy()
         self._cbs.append(cb)
-        return RegisterCallbackHandle(lambda: self._cbs.remove(cb))
+
+        def cancel():
+            self._cbs = self._cbs.copy()
+            self._cbs.remove(cb)
+
+        return RegisterCallbackHandle(cancel)
 
     def notify(self, *args, **kwargs):
         """Notify all registered callbacks."""
         for cb in self._cbs:
             try:
                 cb(*args, **kwargs)
+
             except Exception as e:
                 if self._exception_cb:
                     self._exception_cb(e)
+
                 else:
                     raise
