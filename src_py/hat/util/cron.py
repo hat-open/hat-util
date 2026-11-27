@@ -88,14 +88,18 @@ def _parse_subexpr(subexpr_str, value_parser):
         return AllSubExpr()
 
     if ',' in subexpr_str:
-        return ListSubExpr([_parse_subexpr(i, value_parser)
+        return ListSubExpr([_parse_subexpr_element(i, value_parser)
                             for i in subexpr_str.split(',')])
 
-    if '-' in subexpr_str:
-        from_str, to_str = subexpr_str.split('-')
+    return _parse_subexpr_element(subexpr_str, value_parser)
+
+
+def _parse_subexpr_element(element_str, value_parser):
+    if '-' in element_str:
+        from_str, to_str = element_str.split('-')
         return RangeSubExpr(value_parser(from_str), value_parser(to_str))
 
-    return ValueSubExpr(value_parser(subexpr_str))
+    return ValueSubExpr(value_parser(element_str))
 
 
 def _match_subexpr(subexpr, value):
@@ -115,7 +119,7 @@ def _match_subexpr(subexpr, value):
 
 
 def _parse_minute(value_str):
-    value = int(value_str)
+    value = _parse_number(value_str)
     if not (0 <= value <= 59):
         raise ValueError('invalid minute value')
 
@@ -123,7 +127,7 @@ def _parse_minute(value_str):
 
 
 def _parse_hour(value_str):
-    value = int(value_str)
+    value = _parse_number(value_str)
     if not (0 <= value <= 23):
         raise ValueError('invalid hour value')
 
@@ -131,7 +135,7 @@ def _parse_hour(value_str):
 
 
 def _parse_day(value_str):
-    value = int(value_str)
+    value = _parse_number(value_str)
     if not (1 <= value <= 31):
         raise ValueError('invalid day value')
 
@@ -139,7 +143,7 @@ def _parse_day(value_str):
 
 
 def _parse_month(value_str):
-    value = int(value_str)
+    value = _parse_number(value_str)
     if not (1 <= value <= 12):
         raise ValueError('invalid month value')
 
@@ -147,8 +151,15 @@ def _parse_month(value_str):
 
 
 def _parse_day_of_week(value_str):
-    value = int(value_str)
+    value = _parse_number(value_str)
     if not (0 <= value <= 6):
         raise ValueError('invalid day of week value')
 
     return value
+
+
+def _parse_number(value_str):
+    if not value_str or not all('0' <= i <= '9' for i in value_str):
+        raise ValueError('invalid number')
+
+    return int(value_str)
