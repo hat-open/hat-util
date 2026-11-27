@@ -3,6 +3,11 @@ import typing
 
 
 Bytes: typing.TypeAlias = bytes | bytearray | memoryview
+"""Bytes-like data
+
+Each `memoryview` must be a contiguous view of `bytes` or `bytearray`.
+
+"""
 
 
 class BytesBuffer:
@@ -39,7 +44,7 @@ class BytesBuffer:
 
         if n < 0 or n >= self._data_len:
             data, self._data = self._data, collections.deque()
-            data_len, self._data_len = self._data_len, 0
+            self._data_len = 0
 
             if len(data) < 2:
                 return data[0]
