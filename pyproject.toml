@@ -1,6 +1,6 @@
 [project]
 name = "hat-util"
-version = "0.6.24"
+version = "0.6.25"
 description = "Hat utility library"
 readme = "README.rst"
 requires-python = ">=3.10"
@@ -16,14 +16,14 @@ Documentation = "http://hat-util.hat-open.com"
 
 [dependency-groups]
 run = []
-build = ["hat-doit ~=0.17.0"]
+build = ["hat-doit ~=0.17.1"]
 dev = [
     {include-group = "run"},
     {include-group = "build"},
 ]
 
 [build-system]
-requires = ["hat-doit ~=0.17.0"]
+requires = ["hat-doit ~=0.17.1"]
 build-backend = "hat.doit.pep517"
 
 [tool.hat-doit]
